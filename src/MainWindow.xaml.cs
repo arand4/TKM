@@ -64,17 +64,21 @@ public partial class MainWindow : Window
         InitializeComponent();
         this.KeyDown += MainWindow_KeyDown;
         _appState = AppStateHelper.Load();
-        // Restore window state
-        this.WindowState = _appState.IsFullscreen ? WindowState.Maximized : WindowState.Normal;
-        _isFullscreen = _appState.IsFullscreen;
-        if (!_isFullscreen)
+        // Default to windowed mode unless persisted fullscreen
+        _isFullscreen = _appState != null && _appState.IsFullscreen;
+        if (_isFullscreen)
         {
-            if (_appState.WindowWidth > 0 && _appState.WindowHeight > 0)
+            this.WindowState = WindowState.Maximized;
+        }
+        else
+        {
+            this.WindowState = WindowState.Normal;
+            if (_appState != null && _appState.WindowWidth > 0 && _appState.WindowHeight > 0)
             {
                 this.Width = _appState.WindowWidth;
                 this.Height = _appState.WindowHeight;
             }
-            if (_appState.WindowLeft >= 0 && _appState.WindowTop >= 0)
+            if (_appState != null && _appState.WindowLeft >= 0 && _appState.WindowTop >= 0)
             {
                 this.Left = _appState.WindowLeft;
                 this.Top = _appState.WindowTop;
@@ -89,10 +93,8 @@ public partial class MainWindow : Window
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
     {
-        // Set window as non-activating so it doesn't steal focus from other apps
-        var hwnd = new WindowInteropHelper(this).Handle;
-        var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-        SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle | WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW);
+        // Set window as non-activating so it doesn't steal focus from other apps (only in windowed mode)
+        UpdateWindowActivationStyle();
 
         // Initialize system tray icon
         _trayIconManager = new TrayIconManager(this);
@@ -196,20 +198,14 @@ public partial class MainWindow : Window
         {
             // Book mode - show keyboard on bottom screen
             var keyboardScreen = _dualScreenHelper.GetKeyboardScreen();
-            if (keyboardScreen != null)
+            if (keyboardScreen != null && _isFullscreen)
             {
-                if (_isFullscreen)
-                {
-                    PositionOnScreen(keyboardScreen);
-                }
-                
-                if (_isHiddenDueToPosture)
-                {
-                    this.Show();
-                    if (_isFullscreen)
-                        this.WindowState = WindowState.Maximized;
-                    _isHiddenDueToPosture = false;
-                }
+                PositionOnScreen(keyboardScreen);
+            }
+            if (_isHiddenDueToPosture)
+            {
+                this.Show();
+                _isHiddenDueToPosture = false;
             }
         }
         else if (posture == DevicePosture.LaptopMode)
@@ -222,19 +218,14 @@ public partial class MainWindow : Window
         {
             // Single screen - show on that screen (user might want virtual keyboard anyway)
             var screens = _dualScreenHelper.GetScreens();
-            if (screens.Count > 0)
+            if (screens.Count > 0 && _isFullscreen)
             {
-                if (_isFullscreen)
-                {
-                    PositionOnScreen(screens[0]);
-                }
-                if (_isHiddenDueToPosture)
-                {
-                    this.Show();
-                    if (_isFullscreen)
-                        this.WindowState = WindowState.Maximized;
-                    _isHiddenDueToPosture = false;
-                }
+                PositionOnScreen(screens[0]);
+            }
+            if (_isHiddenDueToPosture)
+            {
+                this.Show();
+                _isHiddenDueToPosture = false;
             }
         }
     }
@@ -246,7 +237,8 @@ public partial class MainWindow : Window
         this.Top = screen.Bounds.Top;
         this.Width = screen.Bounds.Width;
         this.Height = screen.Bounds.Height;
-        this.WindowState = WindowState.Maximized;
+        if (_isFullscreen)
+            this.WindowState = WindowState.Maximized;
     }
 
     private void UpdatePostureIndicator(DevicePosture posture, ScreenArrangement arrangement)
@@ -427,10 +419,30 @@ public partial class MainWindow : Window
                 FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
                 _isFullscreen = true;
             }
+            UpdateWindowActivationStyle();
             _appState.IsFullscreen = _isFullscreen;
             AppStateHelper.Save(_appState);
         }
         catch { /* Ignore */ }
+        // Dynamically update window activation style based on fullscreen/windowed mode
+        private void UpdateWindowActivationStyle()
+        {
+            var hwnd = new WindowInteropHelper(this).Handle;
+            var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
+            if (_isFullscreen)
+            {
+                // Remove NOACTIVATE and TOOLWINDOW for fullscreen
+                extendedStyle &= ~WS_EX_NOACTIVATE;
+                extendedStyle &= ~WS_EX_TOOLWINDOW;
+            }
+            else
+            {
+                // Add NOACTIVATE and TOOLWINDOW for windowed mode
+                extendedStyle |= WS_EX_NOACTIVATE;
+                extendedStyle |= WS_EX_TOOLWINDOW;
+            }
+            SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle);
+        }
     }
 
 

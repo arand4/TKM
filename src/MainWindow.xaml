@@ -128,6 +128,7 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -135,29 +136,28 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        
                         <!-- Row 1 -->
                         <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="Num" Tag="NUMLOCK" Click="Numpad_Click"/>
                         <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="/" Tag="DIVIDE" Click="Numpad_Click"/>
                         <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="*" Tag="MULTIPLY" Click="Numpad_Click"/>
                         <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource KeyButtonStyle}" Content="-" Tag="SUBTRACT" Click="Numpad_Click"/>
-                        
                         <!-- Row 2 -->
                         <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="7" Tag="NUMPAD7" Click="Numpad_Click"/>
                         <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="8" Tag="NUMPAD8" Click="Numpad_Click"/>
                         <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="9" Tag="NUMPAD9" Click="Numpad_Click"/>
                         <Button Grid.Row="1" Grid.Column="3" Grid.RowSpan="2" Style="{StaticResource KeyButtonStyle}" Content="+" Tag="ADD" Click="Numpad_Click"/>
-                        
                         <!-- Row 3 -->
                         <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="4" Tag="NUMPAD4" Click="Numpad_Click"/>
                         <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="5" Tag="NUMPAD5" Click="Numpad_Click"/>
                         <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="6" Tag="NUMPAD6" Click="Numpad_Click"/>
-                        
                         <!-- Row 4 -->
                         <Button Grid.Row="3" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="1" Tag="NUMPAD1" Click="Numpad_Click"/>
                         <Button Grid.Row="3" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="2" Tag="NUMPAD2" Click="Numpad_Click"/>
                         <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="3" Tag="NUMPAD3" Click="Numpad_Click"/>
-                        <Button Grid.Row="3" Grid.Column="3" Style="{StaticResource KeyButtonStyle}" Content="⏎" Tag="RETURN" Click="Numpad_Click"/>
+                        <Button Grid.Row="3" Grid.Column="3" Grid.RowSpan="2" Style="{StaticResource KeyButtonStyle}" Content="⏎" Tag="RETURN" Click="Numpad_Click"/>
+                        <!-- Row 5 -->
+                        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource KeyButtonStyle}" Content="0" Tag="NUMPAD0" Click="Numpad_Click"/>
+                        <Button Grid.Row="4" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="." Tag="DECIMAL" Click="Numpad_Click"/>
                     </Grid>
                 </Border>
             </Grid>

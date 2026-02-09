@@ -26,7 +26,15 @@ namespace TouchKeyboardMouse.Helpers
             try
             {
                 var dir = Path.GetDirectoryName(StateFile);
-                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    if (!Directory.Exists(dir))
+                    {
+                        #pragma warning disable CS8604
+                        Directory.CreateDirectory(dir);
+                        #pragma warning restore CS8604
+                    }
+                }
                 var json = JsonSerializer.Serialize(state);
                 File.WriteAllText(StateFile, json);
             }
