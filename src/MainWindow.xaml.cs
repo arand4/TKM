@@ -24,8 +24,6 @@ public partial class MainWindow : Window
     private TrayIconManager? _trayIconManager;
     private bool _isHiddenDueToPosture = false;
     private bool _isFullscreen = true;
-    private WindowState _previousWindowState = WindowState.Normal;
-    private double _previousLeft, _previousTop, _previousWidth, _previousHeight;
     private bool _settingsInitialized = false;
 
     public MainWindow()
