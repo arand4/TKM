@@ -95,9 +95,8 @@ public class TrayIconManager : IDisposable
     private void OpenSettings()
     {
         ShowMainWindow();
-        var settingsWindow = new SettingsWindow();
-        settingsWindow.Owner = _mainWindow;
-        settingsWindow.ShowDialog();
+        // Toggle the settings sidebar
+        _mainWindow.ToggleSettings();
     }
 
     private void ExitApplication()
