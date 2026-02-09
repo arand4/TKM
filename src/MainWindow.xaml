@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:TouchKeyboardMouse.Controls"
         Title="Touch Keyboard &amp; Mouse"
         WindowStyle="None"
-        WindowState="Maximized"
+        WindowState="Normal"
         AllowsTransparency="False"
         Topmost="True"
         Background="#1a1a1a"

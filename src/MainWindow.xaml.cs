@@ -10,6 +10,30 @@ namespace TouchKeyboardMouse;
 
 public partial class MainWindow : Window
 {
+    // ...existing code...
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        try { this.WindowState = WindowState.Minimized; } catch { }
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        try { this.Close(); } catch { }
+    }
+
+    private void ResizeGrip_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        try
+        {
+            if (_isResizingTrackpad)
+            {
+                _isResizingTrackpad = false;
+                (sender as Border)?.ReleaseMouseCapture();
+                e.Handled = true;
+            }
+        }
+        catch { /* Ignore */ }
+    }
     // Keep window from being focused to allow typing in other apps
     private const int GWL_EXSTYLE = -20;
     private const int WS_EX_NOACTIVATE = 0x08000000;
@@ -24,7 +48,7 @@ public partial class MainWindow : Window
     private DualScreenHelper? _dualScreenHelper;
     private TrayIconManager? _trayIconManager;
     private bool _isHiddenDueToPosture = false;
-    private bool _isFullscreen = true;
+    private bool _isFullscreen = false;
     private bool _settingsInitialized = false;
     private bool _numpadVisible = false;
     private bool _trackpadWasFullWidth = true;
@@ -34,12 +58,33 @@ public partial class MainWindow : Window
     private Point _resizeStartPoint;
     private double _resizeStartWidth;
 
+    private AppState _appState;
     public MainWindow()
     {
         InitializeComponent();
-        
-        // Handle keyboard shortcuts
         this.KeyDown += MainWindow_KeyDown;
+        _appState = AppStateHelper.Load();
+        // Restore window state
+        this.WindowState = _appState.IsFullscreen ? WindowState.Maximized : WindowState.Normal;
+        _isFullscreen = _appState.IsFullscreen;
+        if (!_isFullscreen)
+        {
+            if (_appState.WindowWidth > 0 && _appState.WindowHeight > 0)
+            {
+                this.Width = _appState.WindowWidth;
+                this.Height = _appState.WindowHeight;
+            }
+            if (_appState.WindowLeft >= 0 && _appState.WindowTop >= 0)
+            {
+                this.Left = _appState.WindowLeft;
+                this.Top = _appState.WindowTop;
+            }
+        }
+        // Restore trackpad width
+        if (_appState.TrackpadWidth > 0 && Trackpad != null)
+            Trackpad.Width = _appState.TrackpadWidth;
+        // Restore numpad state
+        _numpadVisible = _appState.NumpadVisible;
     }
 
     private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -77,6 +122,15 @@ public partial class MainWindow : Window
             if (_trackpadWasFullWidth)
             {
                 UpdateTrackpadToFullWidth();
+            }
+            // Save window size and position
+            if (this.WindowState == WindowState.Normal)
+            {
+                _appState.WindowWidth = this.Width;
+                _appState.WindowHeight = this.Height;
+                _appState.WindowLeft = this.Left;
+                _appState.WindowTop = this.Top;
+                AppStateHelper.Save(_appState);
             }
         }
         catch { /* Ignore */ }
@@ -356,14 +410,11 @@ public partial class MainWindow : Window
             {
                 // Exit fullscreen
                 this.WindowState = WindowState.Normal;
-                
-                // Set to a reasonable windowed size
                 var workArea = SystemParameters.WorkArea;
                 this.Width = Math.Min(1200, workArea.Width * 0.8);
                 this.Height = Math.Min(700, workArea.Height * 0.8);
                 this.Left = (workArea.Width - this.Width) / 2;
                 this.Top = (workArea.Height - this.Height) / 2;
-                
                 FullscreenButton.Content = "⛶";
                 FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
                 _isFullscreen = false;
@@ -376,22 +427,14 @@ public partial class MainWindow : Window
                 FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
                 _isFullscreen = true;
             }
+            _appState.IsFullscreen = _isFullscreen;
+            AppStateHelper.Save(_appState);
         }
         catch { /* Ignore */ }
     }
 
-    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
-    {
-        try { this.WindowState = WindowState.Minimized; } catch { }
-    }
 
-    private void CloseButton_Click(object sender, RoutedEventArgs e)
-    {
-        try { this.Close(); } catch { }
-    }
-
-    #region Settings Handlers
-
+#region Settings Handlers
     private void CursorSensitivitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (!_settingsInitialized || CursorSensitivityValue == null) return;
@@ -465,10 +508,8 @@ public partial class MainWindow : Window
         try
         {
             if (!_isResizingTrackpad || TrackpadArea == null || Trackpad == null) return;
-            
             var currentPoint = e.GetPosition(TrackpadArea);
             var isLeftGrip = sender == LeftResizeGrip;
-            
             // Calculate delta from center
             double delta;
             if (isLeftGrip)
@@ -481,37 +522,20 @@ public partial class MainWindow : Window
                 // Right grip: moving right increases width, moving left decreases
                 delta = currentPoint.X - _resizeStartPoint.X;
             }
-            
             // Apply symmetrical resize (delta applies to BOTH sides)
             var newWidth = _resizeStartWidth + (delta * 2);
-            
             // Clamp to valid range
             var minWidth = 300.0;
             var maxWidth = TrackpadArea.ActualWidth - 24; // Account for grip widths
             if (maxWidth <= minWidth) return;
-            
             newWidth = Math.Max(minWidth, Math.Min(maxWidth, newWidth));
-            
             Trackpad.Width = newWidth;
             _trackpadWasFullWidth = false; // User is manually resizing
-            
+            _appState.TrackpadWidth = newWidth;
+            AppStateHelper.Save(_appState);
             e.Handled = true;
         }
         catch { /* Ignore resize errors */ }
-    }
-    
-    private void ResizeGrip_MouseUp(object sender, MouseButtonEventArgs e)
-    {
-        try
-        {
-            if (_isResizingTrackpad)
-            {
-                _isResizingTrackpad = false;
-                (sender as Border)?.ReleaseMouseCapture();
-                e.Handled = true;
-            }
-        }
-        catch { /* Ignore */ }
     }
     
     #endregion
