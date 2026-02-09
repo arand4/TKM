@@ -213,7 +213,6 @@ public partial class MainWindow : Window
         if (_isFullscreen)
         {
             // Exit fullscreen
-            _previousWindowState = this.WindowState;
             this.WindowState = WindowState.Normal;
             
             // Set to a reasonable windowed size
