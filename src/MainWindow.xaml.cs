@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private bool _isFullscreen = true;
     private bool _settingsInitialized = false;
     private bool _numpadVisible = false;
+    private bool _trackpadWasFullWidth = true;
     
     // Trackpad resize state
     private bool _isResizingTrackpad = false;
@@ -70,38 +71,40 @@ public partial class MainWindow : Window
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        // Update trackpad resize grip positions when window is resized
-        UpdateResizeGripPositions();
+        // Update trackpad width if it was at full width
+        if (_trackpadWasFullWidth)
+        {
+            UpdateTrackpadToFullWidth();
+        }
     }
     
     private void UpdateTrackpadWidth()
     {
-        if (TrackpadArea == null || Trackpad == null) return;
-        
-        // Default to full width
-        var availableWidth = TrackpadArea.ActualWidth;
-        if (availableWidth > 0)
-        {
-            Trackpad.Width = availableWidth;
-        }
-        UpdateResizeGripPositions();
+        // Set trackpad to full width on startup
+        UpdateTrackpadToFullWidth();
     }
     
-    private void UpdateResizeGripPositions()
+    private void UpdateTrackpadToFullWidth()
     {
-        if (Trackpad == null || TrackpadArea == null || LeftResizeGrip == null || RightResizeGrip == null) return;
-        if (TrackpadArea.ActualWidth <= 0) return;
+        if (TrackpadArea == null || Trackpad == null || TrackpadWithGrips == null) return;
         
-        // Get trackpad width (handle NaN for auto-sized)
+        var availableWidth = TrackpadArea.ActualWidth - 24; // Subtract grip widths
+        if (availableWidth > 300)
+        {
+            Trackpad.Width = availableWidth;
+            _trackpadWasFullWidth = true;
+        }
+    }
+    
+    private bool IsTrackpadAtFullWidth()
+    {
+        if (TrackpadArea == null || Trackpad == null) return true;
+        
+        var availableWidth = TrackpadArea.ActualWidth - 24;
         var trackpadWidth = double.IsNaN(Trackpad.Width) ? Trackpad.ActualWidth : Trackpad.Width;
-        if (trackpadWidth <= 0) trackpadWidth = TrackpadArea.ActualWidth;
         
-        // Position grips at the edges of the trackpad
-        var trackpadLeft = (TrackpadArea.ActualWidth - trackpadWidth) / 2;
-        if (trackpadLeft < 0) trackpadLeft = 0;
-        
-        LeftResizeGrip.Margin = new Thickness(trackpadLeft - 4, 0, 0, 0);
-        RightResizeGrip.Margin = new Thickness(0, 0, trackpadLeft - 4, 0);
+        // Consider "full width" if within 50 pixels of available
+        return trackpadWidth >= availableWidth - 50;
     }
 
     private void OnPostureChanged(object? sender, PostureChangedEventArgs e)
@@ -223,16 +226,20 @@ public partial class MainWindow : Window
     
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        if (e.ClickCount == 2)
+        try
         {
-            // Double-click to toggle fullscreen
-            ToggleFullscreen();
+            if (e.ClickCount == 2)
+            {
+                // Double-click to toggle fullscreen
+                ToggleFullscreen();
+            }
+            else if (WindowState != WindowState.Maximized)
+            {
+                // Drag window when not maximized
+                this.DragMove();
+            }
         }
-        else if (WindowState != WindowState.Maximized)
-        {
-            // Drag window when not maximized
-            this.DragMove();
-        }
+        catch { /* Ignore drag errors */ }
     }
     
     private void NumpadButton_Click(object sender, RoutedEventArgs e)
@@ -241,15 +248,34 @@ public partial class MainWindow : Window
         
         if (_numpadVisible)
         {
+            // Remember if trackpad was at full width before showing numpad
+            _trackpadWasFullWidth = IsTrackpadAtFullWidth();
+            
             NumpadColumn.Width = new GridLength(200);
             NumpadPanel.Visibility = Visibility.Visible;
             NumpadButton.Content = "⌨";
+            
+            // If trackpad was at full width, adjust it to fit the new available space
+            if (_trackpadWasFullWidth)
+            {
+                // Wait for layout to update, then set full width
+                Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
+                    System.Windows.Threading.DispatcherPriority.Loaded);
+            }
         }
         else
         {
             NumpadColumn.Width = new GridLength(0);
             NumpadPanel.Visibility = Visibility.Collapsed;
             NumpadButton.Content = "#";
+            
+            // If trackpad was at full width before numpad was shown, restore full width
+            if (_trackpadWasFullWidth)
+            {
+                // Wait for layout to update, then set full width
+                Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
+                    System.Windows.Threading.DispatcherPriority.Loaded);
+            }
         }
     }
     
@@ -361,11 +387,8 @@ public partial class MainWindow : Window
         AlwaysOnTopCheckBox.IsChecked = true;
         
         // Reset trackpad to full width
-        if (TrackpadArea != null && Trackpad != null && TrackpadArea.ActualWidth > 0)
-        {
-            Trackpad.Width = TrackpadArea.ActualWidth;
-            UpdateResizeGripPositions();
-        }
+        _trackpadWasFullWidth = true;
+        UpdateTrackpadToFullWidth();
     }
     
     #endregion
@@ -374,65 +397,77 @@ public partial class MainWindow : Window
     
     private void ResizeGrip_MouseDown(object sender, MouseButtonEventArgs e)
     {
-        if (TrackpadArea == null || Trackpad == null) return;
-        
-        _isResizingTrackpad = true;
-        _resizeStartPoint = e.GetPosition(TrackpadArea);
-        _resizeStartWidth = Trackpad.Width;
-        
-        if (double.IsNaN(_resizeStartWidth))
-            _resizeStartWidth = Trackpad.ActualWidth;
-        if (_resizeStartWidth <= 0)
-            _resizeStartWidth = TrackpadArea.ActualWidth;
+        try
+        {
+            if (TrackpadArea == null || Trackpad == null) return;
             
-        ((Border)sender).CaptureMouse();
-        e.Handled = true;
+            _isResizingTrackpad = true;
+            _resizeStartPoint = e.GetPosition(TrackpadArea);
+            _resizeStartWidth = Trackpad.Width;
+            
+            if (double.IsNaN(_resizeStartWidth))
+                _resizeStartWidth = Trackpad.ActualWidth;
+            if (_resizeStartWidth <= 0)
+                _resizeStartWidth = TrackpadArea.ActualWidth - 24;
+                
+            (sender as Border)?.CaptureMouse();
+            e.Handled = true;
+        }
+        catch { /* Ignore resize errors */ }
     }
     
     private void ResizeGrip_MouseMove(object sender, MouseEventArgs e)
     {
-        if (!_isResizingTrackpad || TrackpadArea == null || Trackpad == null) return;
-        
-        var currentPoint = e.GetPosition(TrackpadArea);
-        var isLeftGrip = sender == LeftResizeGrip;
-        
-        // Calculate delta from center
-        double delta;
-        if (isLeftGrip)
+        try
         {
-            // Left grip: moving left increases width, moving right decreases
-            delta = _resizeStartPoint.X - currentPoint.X;
+            if (!_isResizingTrackpad || TrackpadArea == null || Trackpad == null) return;
+            
+            var currentPoint = e.GetPosition(TrackpadArea);
+            var isLeftGrip = sender == LeftResizeGrip;
+            
+            // Calculate delta from center
+            double delta;
+            if (isLeftGrip)
+            {
+                // Left grip: moving left increases width, moving right decreases
+                delta = _resizeStartPoint.X - currentPoint.X;
+            }
+            else
+            {
+                // Right grip: moving right increases width, moving left decreases
+                delta = currentPoint.X - _resizeStartPoint.X;
+            }
+            
+            // Apply symmetrical resize (delta applies to BOTH sides)
+            var newWidth = _resizeStartWidth + (delta * 2);
+            
+            // Clamp to valid range
+            var minWidth = 300.0;
+            var maxWidth = TrackpadArea.ActualWidth - 24; // Account for grip widths
+            if (maxWidth <= minWidth) return;
+            
+            newWidth = Math.Max(minWidth, Math.Min(maxWidth, newWidth));
+            
+            Trackpad.Width = newWidth;
+            _trackpadWasFullWidth = false; // User is manually resizing
+            
+            e.Handled = true;
         }
-        else
-        {
-            // Right grip: moving right increases width, moving left decreases
-            delta = currentPoint.X - _resizeStartPoint.X;
-        }
-        
-        // Apply symmetrical resize (delta applies to BOTH sides)
-        var newWidth = _resizeStartWidth + (delta * 2);
-        
-        // Clamp to valid range
-        var minWidth = 300.0;
-        var maxWidth = TrackpadArea.ActualWidth;
-        if (maxWidth <= 0) return;
-        
-        newWidth = Math.Max(minWidth, Math.Min(maxWidth, newWidth));
-        
-        Trackpad.Width = newWidth;
-        UpdateResizeGripPositions();
-        
-        e.Handled = true;
+        catch { /* Ignore resize errors */ }
     }
     
     private void ResizeGrip_MouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (_isResizingTrackpad)
+        try
         {
-            _isResizingTrackpad = false;
-            ((Border)sender).ReleaseMouseCapture();
-            e.Handled = true;
+            if (_isResizingTrackpad)
+            {
+                _isResizingTrackpad = false;
+                (sender as Border)?.ReleaseMouseCapture();
+                e.Handled = true;
+            }
         }
+        catch { /* Ignore */ }
     }
     
     #endregion

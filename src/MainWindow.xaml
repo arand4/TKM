@@ -85,26 +85,33 @@
                     <ColumnDefinition x:Name="NumpadColumn" Width="0"/>
                 </Grid.ColumnDefinitions>
                 
-                <!-- Trackpad Area -->
+                <!-- Trackpad Area with centered trackpad and attached grips -->
                 <Grid x:Name="TrackpadArea" Grid.Column="0">
-                    <!-- Left resize grip -->
-                    <Border x:Name="LeftResizeGrip" HorizontalAlignment="Left" Width="12" Background="Transparent" Cursor="SizeWE"
-                            MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp"
-                            Panel.ZIndex="10">
-                        <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
-                                Margin="4,0,0,0"/>
-                    </Border>
-                    
-                    <!-- Trackpad -->
-                    <local:Trackpad x:Name="Trackpad" HorizontalAlignment="Center" MinWidth="300"/>
-                    
-                    <!-- Right resize grip -->
-                    <Border x:Name="RightResizeGrip" HorizontalAlignment="Right" Width="12" Background="Transparent" Cursor="SizeWE"
-                            MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp"
-                            Panel.ZIndex="10">
-                        <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
-                                Margin="0,0,4,0"/>
-                    </Border>
+                    <!-- Centered container that holds trackpad and grips together -->
+                    <Grid x:Name="TrackpadWithGrips" HorizontalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Left resize grip -->
+                        <Border Grid.Column="0" x:Name="LeftResizeGrip" Background="Transparent" Cursor="SizeWE"
+                                MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp">
+                            <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
+                                    HorizontalAlignment="Right"/>
+                        </Border>
+                        
+                        <!-- Trackpad -->
+                        <local:Trackpad x:Name="Trackpad" Grid.Column="1" MinWidth="300"/>
+                        
+                        <!-- Right resize grip -->
+                        <Border Grid.Column="2" x:Name="RightResizeGrip" Background="Transparent" Cursor="SizeWE"
+                                MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp">
+                            <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
+                                    HorizontalAlignment="Left"/>
+                        </Border>
+                    </Grid>
                 </Grid>
                 
                 <!-- Numpad Panel -->
