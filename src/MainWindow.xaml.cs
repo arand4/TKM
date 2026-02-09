@@ -378,6 +378,8 @@ public partial class MainWindow : Window
             e.Handled = true;
         }
     }
+    
+    #endregion
 
     // Prevent window from being activated when clicking
     protected override void OnActivated(EventArgs e)
