@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AssemblyName>TouchKeyboardMouse</AssemblyName>
+    <RootNamespace>TouchKeyboardMouse</RootNamespace>
+    <Version>1.0.0</Version>
+    <Description>Virtual keyboard and trackpad for dual-screen Windows devices</Description>
+  </PropertyGroup>
+
+</Project>

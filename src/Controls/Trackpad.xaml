@@ -1,0 +1,82 @@
+<UserControl x:Class="TouchKeyboardMouse.Controls.Trackpad"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="50"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Trackpad Surface -->
+        <Border Grid.Row="0" 
+                Background="#252525" 
+                CornerRadius="8" 
+                BorderBrush="#404040" 
+                BorderThickness="1"
+                Margin="0,0,0,5">
+            <Grid>
+                <!-- Touch surface -->
+                <Canvas x:Name="TrackpadSurface" 
+                        Background="Transparent"
+                        TouchDown="TrackpadSurface_TouchDown"
+                        TouchMove="TrackpadSurface_TouchMove"
+                        TouchUp="TrackpadSurface_TouchUp"
+                        MouseDown="TrackpadSurface_MouseDown"
+                        MouseMove="TrackpadSurface_MouseMove"
+                        MouseUp="TrackpadSurface_MouseUp"
+                        IsManipulationEnabled="True"
+                        ManipulationStarting="TrackpadSurface_ManipulationStarting"
+                        ManipulationDelta="TrackpadSurface_ManipulationDelta"/>
+                
+                <!-- Visual feedback indicator -->
+                <Ellipse x:Name="TouchIndicator" 
+                         Width="40" Height="40" 
+                         Fill="#30FFFFFF" 
+                         Visibility="Collapsed"
+                         IsHitTestVisible="False"
+                         HorizontalAlignment="Left"
+                         VerticalAlignment="Top"/>
+                
+                <!-- Hint text -->
+                <TextBlock Text="Touch and drag to move cursor&#x0a;Tap to click · Two-finger tap for right-click&#x0a;Two-finger drag to scroll"
+                           Foreground="#505050"
+                           FontSize="12"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextAlignment="Center"
+                           IsHitTestVisible="False"/>
+            </Grid>
+        </Border>
+        
+        <!-- Click Buttons -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- Left Click Button -->
+            <Button Grid.Column="0" 
+                    Style="{StaticResource TrackpadButtonStyle}"
+                    x:Name="LeftClickButton"
+                    Content="Left Click"
+                    PreviewMouseDown="LeftClickButton_MouseDown"
+                    PreviewMouseUp="LeftClickButton_MouseUp"
+                    PreviewTouchDown="LeftClickButton_TouchDown"
+                    PreviewTouchUp="LeftClickButton_TouchUp"/>
+            
+            <!-- Right Click Button -->
+            <Button Grid.Column="2" 
+                    Style="{StaticResource TrackpadButtonStyle}"
+                    x:Name="RightClickButton"
+                    Content="Right Click"
+                    PreviewMouseDown="RightClickButton_MouseDown"
+                    PreviewMouseUp="RightClickButton_MouseUp"
+                    PreviewTouchDown="RightClickButton_TouchDown"
+                    PreviewTouchUp="RightClickButton_TouchUp"/>
+        </Grid>
+    </Grid>
+</UserControl>

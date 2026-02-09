@@ -1,0 +1,63 @@
+<Window x:Class="TouchKeyboardMouse.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TouchKeyboardMouse.Controls"
+        Title="Touch Keyboard &amp; Mouse"
+        WindowStyle="None"
+        WindowState="Maximized"
+        AllowsTransparency="False"
+        Topmost="True"
+        Background="#1a1a1a"
+        ShowInTaskbar="True"
+        ResizeMode="NoResize"
+        Loaded="Window_Loaded">
+    
+    <Window.InputBindings>
+        <KeyBinding Key="Escape" Command="{Binding ExitCommand}" />
+    </Window.InputBindings>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- Top bar with controls -->
+            <RowDefinition Height="40"/>
+            <!-- Keyboard area (60%) -->
+            <RowDefinition Height="6*"/>
+            <!-- Trackpad area (40%) -->
+            <RowDefinition Height="4*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Top Control Bar -->
+        <Border Grid.Row="0" Background="#0d0d0d" BorderBrush="#333" BorderThickness="0,0,0,1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <TextBlock Text="Touch Keyboard &amp; Mouse" Foreground="#888" FontSize="14" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="PostureStatusText" Text="" Foreground="#666" FontSize="12" 
+                               VerticalAlignment="Center" Margin="15,0,0,0"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <!-- Settings button -->
+                    <Button x:Name="SettingsButton" Style="{StaticResource ControlButtonStyle}" 
+                            Content="⚙" Click="SettingsButton_Click" ToolTip="Settings"/>
+                    <!-- Minimize button -->
+                    <Button x:Name="MinimizeButton" Style="{StaticResource ControlButtonStyle}" 
+                            Content="−" Click="MinimizeButton_Click" ToolTip="Minimize"/>
+                    <!-- Close button -->
+                    <Button x:Name="CloseButton" Style="{StaticResource CloseButtonStyle}" 
+                            Content="✕" Click="CloseButton_Click" ToolTip="Exit (Esc)"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+        
+        <!-- Keyboard -->
+        <local:VirtualKeyboard x:Name="Keyboard" Grid.Row="1" Margin="5"/>
+        
+        <!-- Trackpad -->
+        <local:Trackpad x:Name="Trackpad" Grid.Row="2" Margin="5,0,5,5"/>
+    </Grid>
+</Window>
