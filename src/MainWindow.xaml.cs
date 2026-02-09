@@ -260,7 +260,7 @@ public partial class MainWindow : Window
             var keyCode = VirtualKeyCodes.GetKeyCode(keyName);
             if (keyCode != 0)
             {
-                InputSimulator.SendKeyPress(keyCode);
+                InputSimulator.SendKey(keyCode);
             }
         }
     }
