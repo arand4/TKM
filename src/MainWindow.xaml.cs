@@ -337,4 +337,3 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 }
-}
