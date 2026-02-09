@@ -419,13 +419,13 @@ public partial class MainWindow : Window
                 FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
                 _isFullscreen = true;
             }
-            UpdateWindowActivationStyle();
             _appState.IsFullscreen = _isFullscreen;
             AppStateHelper.Save(_appState);
         }
         catch { /* Ignore */ }
-        // Dynamically update window activation style based on fullscreen/windowed mode
-        private void UpdateWindowActivationStyle()
+        UpdateWindowActivationStyle();
+    // Dynamically update window activation style based on fullscreen/windowed mode
+    void UpdateWindowActivationStyle()
         {
             var hwnd = new WindowInteropHelper(this).Handle;
             var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);

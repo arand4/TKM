@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Virtual keyboard and trackpad for dual-screen Windows devices")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+361040a5c51919525bf9b9c1a0abdc33b0120934")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5ba6f845fd8f8280b7ef5aeae493d823e5c771a0")]
 [assembly: System.Reflection.AssemblyProductAttribute("TouchKeyboardMouse")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TouchKeyboardMouse")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
