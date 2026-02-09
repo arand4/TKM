@@ -25,6 +25,11 @@ public partial class MainWindow : Window
     private bool _isHiddenDueToPosture = false;
     private bool _isFullscreen = true;
     private bool _settingsInitialized = false;
+    
+    // Trackpad resize state
+    private bool _isResizingTrackpad = false;
+    private Point _resizeStartPoint;
+    private double _resizeStartWidth;
 
     public MainWindow()
     {
@@ -48,11 +53,14 @@ public partial class MainWindow : Window
         _dualScreenHelper = new DualScreenHelper();
         _dualScreenHelper.PostureChanged += OnPostureChanged;
 
-        // Handle window resize to update trackpad width
+        // Handle window resize to update resize grips position
         this.SizeChanged += MainWindow_SizeChanged;
 
         // Mark settings as initialized (prevents slider events during load)
         _settingsInitialized = true;
+        
+        // Initialize trackpad width
+        UpdateTrackpadWidth();
 
         // Initial positioning based on current posture
         UpdateWindowForPosture();
@@ -60,18 +68,36 @@ public partial class MainWindow : Window
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        // Recalculate trackpad width when window is resized
-        if (_settingsInitialized && TrackpadWidthSlider != null)
+        // Update trackpad resize grip positions when window is resized
+        UpdateResizeGripPositions();
+    }
+    
+    private void UpdateTrackpadWidth()
+    {
+        // Default to full width
+        var availableWidth = TrackpadContainer.ActualWidth;
+        if (availableWidth > 0)
         {
-            var percent = (int)TrackpadWidthSlider.Value;
-            if (percent < 100)
-            {
-                var availableWidth = this.ActualWidth;
-                if (SettingsSidebar.Visibility == Visibility.Visible)
-                    availableWidth -= 280;
-                Trackpad.MaxWidth = (availableWidth - 10) * (percent / 100.0);
-            }
+            Trackpad.Width = availableWidth;
         }
+        UpdateResizeGripPositions();
+    }
+    
+    private void UpdateResizeGripPositions()
+    {
+        if (Trackpad == null || TrackpadContainer == null) return;
+        if (TrackpadContainer.ActualWidth <= 0) return;
+        
+        // Get trackpad width (handle NaN for auto-sized)
+        var trackpadWidth = double.IsNaN(Trackpad.Width) ? Trackpad.ActualWidth : Trackpad.Width;
+        if (trackpadWidth <= 0) trackpadWidth = TrackpadContainer.ActualWidth;
+        
+        // Position grips at the edges of the trackpad
+        var trackpadLeft = (TrackpadContainer.ActualWidth - trackpadWidth) / 2;
+        if (trackpadLeft < 0) trackpadLeft = 0;
+        
+        LeftResizeGrip.Margin = new Thickness(trackpadLeft - 4, 0, 0, 0);
+        RightResizeGrip.Margin = new Thickness(0, 0, trackpadLeft - 4, 0);
     }
 
     private void OnPostureChanged(object? sender, PostureChangedEventArgs e)
@@ -248,30 +274,6 @@ public partial class MainWindow : Window
 
     #region Settings Handlers
 
-    private void TrackpadWidthSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-    {
-        if (!_settingsInitialized || TrackpadWidthValue == null) return;
-        
-        var percent = (int)e.NewValue;
-        TrackpadWidthValue.Text = $"{percent}%";
-        
-        // Update the trackpad width as percentage of available space
-        if (percent >= 100)
-        {
-            Trackpad.HorizontalAlignment = HorizontalAlignment.Stretch;
-            Trackpad.MaxWidth = double.PositiveInfinity;
-        }
-        else
-        {
-            Trackpad.HorizontalAlignment = HorizontalAlignment.Center;
-            // Calculate width based on window width
-            var availableWidth = this.ActualWidth - 290; // Account for settings sidebar if open
-            if (SettingsSidebar.Visibility != Visibility.Visible)
-                availableWidth = this.ActualWidth;
-            Trackpad.MaxWidth = (availableWidth - 10) * (percent / 100.0);
-        }
-    }
-
     private void CursorSensitivitySlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
         if (!_settingsInitialized || CursorSensitivityValue == null) return;
@@ -305,14 +307,77 @@ public partial class MainWindow : Window
 
     private void ResetDefaults_Click(object sender, RoutedEventArgs e)
     {
-        TrackpadWidthSlider.Value = 100;
         CursorSensitivitySlider.Value = 1.5;
         ScrollSensitivitySlider.Value = 2.0;
         TapThresholdSlider.Value = 200;
         AlwaysOnTopCheckBox.IsChecked = true;
+        
+        // Reset trackpad to full width
+        Trackpad.Width = TrackpadContainer.ActualWidth;
+        UpdateResizeGripPositions();
     }
-
+    
     #endregion
+    
+    #region Trackpad Resize Handlers
+    
+    private void ResizeGrip_MouseDown(object sender, MouseButtonEventArgs e)
+    {
+        _isResizingTrackpad = true;
+        _resizeStartPoint = e.GetPosition(TrackpadContainer);
+        _resizeStartWidth = Trackpad.Width;
+        
+        if (double.IsNaN(_resizeStartWidth))
+            _resizeStartWidth = Trackpad.ActualWidth;
+            
+        ((Border)sender).CaptureMouse();
+        e.Handled = true;
+    }
+    
+    private void ResizeGrip_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (!_isResizingTrackpad) return;
+        
+        var currentPoint = e.GetPosition(TrackpadContainer);
+        var containerCenter = TrackpadContainer.ActualWidth / 2;
+        var isLeftGrip = sender == LeftResizeGrip;
+        
+        // Calculate delta from center
+        double delta;
+        if (isLeftGrip)
+        {
+            // Left grip: moving left increases width, moving right decreases
+            delta = _resizeStartPoint.X - currentPoint.X;
+        }
+        else
+        {
+            // Right grip: moving right increases width, moving left decreases
+            delta = currentPoint.X - _resizeStartPoint.X;
+        }
+        
+        // Apply symmetrical resize (delta applies to BOTH sides)
+        var newWidth = _resizeStartWidth + (delta * 2);
+        
+        // Clamp to valid range
+        var minWidth = 300.0;
+        var maxWidth = TrackpadContainer.ActualWidth;
+        newWidth = Math.Max(minWidth, Math.Min(maxWidth, newWidth));
+        
+        Trackpad.Width = newWidth;
+        UpdateResizeGripPositions();
+        
+        e.Handled = true;
+    }
+    
+    private void ResizeGrip_MouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_isResizingTrackpad)
+        {
+            _isResizingTrackpad = false;
+            ((Border)sender).ReleaseMouseCapture();
+            e.Handled = true;
+        }
+    }
 
     // Prevent window from being activated when clicking
     protected override void OnActivated(EventArgs e)
