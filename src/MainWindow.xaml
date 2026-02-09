@@ -29,15 +29,15 @@
             <Grid.RowDefinitions>
                 <!-- Top bar with controls -->
                 <RowDefinition Height="40"/>
-                <!-- Keyboard area (2/3 of content) -->
-                <RowDefinition Height="2*"/>
-                <!-- Trackpad area (1/3 of content) -->
-                <RowDefinition x:Name="TrackpadRow" Height="*"/>
+                <!-- Keyboard area (3/5 of content) -->
+                <RowDefinition Height="3*"/>
+                <!-- Trackpad area (2/5 of content) -->
+                <RowDefinition x:Name="TrackpadRow" Height="2*"/>
             </Grid.RowDefinitions>
             
             <!-- Top Control Bar -->
             <Border Grid.Row="0" Background="#0d0d0d" BorderBrush="#333" BorderThickness="0,0,0,1"
-                    WindowChrome.IsHitTestVisibleInChrome="True">
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -51,18 +51,26 @@
                     </StackPanel>
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                        <!-- Numpad toggle button -->
+                        <Button x:Name="NumpadButton" Style="{StaticResource ControlButtonStyle}" 
+                                Content="#" Click="NumpadButton_Click" ToolTip="Toggle Numpad"
+                                WindowChrome.IsHitTestVisibleInChrome="True"/>
                         <!-- Settings toggle button -->
                         <Button x:Name="SettingsButton" Style="{StaticResource ControlButtonStyle}" 
-                                Content="⚙" Click="SettingsButton_Click" ToolTip="Settings"/>
+                                Content="⚙" Click="SettingsButton_Click" ToolTip="Settings"
+                                WindowChrome.IsHitTestVisibleInChrome="True"/>
                         <!-- Fullscreen toggle button -->
                         <Button x:Name="FullscreenButton" Style="{StaticResource ControlButtonStyle}" 
-                                Content="⛶" Click="FullscreenButton_Click" ToolTip="Toggle Fullscreen (F11)"/>
+                                Content="⛶" Click="FullscreenButton_Click" ToolTip="Toggle Fullscreen (F11)"
+                                WindowChrome.IsHitTestVisibleInChrome="True"/>
                         <!-- Minimize button -->
                         <Button x:Name="MinimizeButton" Style="{StaticResource ControlButtonStyle}" 
-                                Content="−" Click="MinimizeButton_Click" ToolTip="Minimize"/>
+                                Content="−" Click="MinimizeButton_Click" ToolTip="Minimize"
+                                WindowChrome.IsHitTestVisibleInChrome="True"/>
                         <!-- Close button -->
                         <Button x:Name="CloseButton" Style="{StaticResource CloseButtonStyle}" 
-                                Content="✕" Click="CloseButton_Click" ToolTip="Exit (Esc)"/>
+                                Content="✕" Click="CloseButton_Click" ToolTip="Exit (Esc)"
+                                WindowChrome.IsHitTestVisibleInChrome="True"/>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -70,25 +78,75 @@
             <!-- Keyboard -->
             <local:VirtualKeyboard x:Name="Keyboard" Grid.Row="1" Margin="5"/>
             
-            <!-- Trackpad with resize grips -->
+            <!-- Trackpad with resize grips and optional numpad -->
             <Grid x:Name="TrackpadContainer" Grid.Row="2" Margin="5,0,5,5">
-                <!-- Left resize grip -->
-                <Border x:Name="LeftResizeGrip" HorizontalAlignment="Left" Width="12" Background="Transparent" Cursor="SizeWE"
-                        MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp"
-                        Panel.ZIndex="10">
-                    <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
-                            Margin="4,0,0,0"/>
-                </Border>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition x:Name="NumpadColumn" Width="0"/>
+                </Grid.ColumnDefinitions>
                 
-                <!-- Trackpad -->
-                <local:Trackpad x:Name="Trackpad" HorizontalAlignment="Center" MinWidth="300"/>
+                <!-- Trackpad Area -->
+                <Grid x:Name="TrackpadArea" Grid.Column="0">
+                    <!-- Left resize grip -->
+                    <Border x:Name="LeftResizeGrip" HorizontalAlignment="Left" Width="12" Background="Transparent" Cursor="SizeWE"
+                            MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp"
+                            Panel.ZIndex="10">
+                        <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
+                                Margin="4,0,0,0"/>
+                    </Border>
+                    
+                    <!-- Trackpad -->
+                    <local:Trackpad x:Name="Trackpad" HorizontalAlignment="Center" MinWidth="300"/>
+                    
+                    <!-- Right resize grip -->
+                    <Border x:Name="RightResizeGrip" HorizontalAlignment="Right" Width="12" Background="Transparent" Cursor="SizeWE"
+                            MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp"
+                            Panel.ZIndex="10">
+                        <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
+                                Margin="0,0,4,0"/>
+                    </Border>
+                </Grid>
                 
-                <!-- Right resize grip -->
-                <Border x:Name="RightResizeGrip" HorizontalAlignment="Right" Width="12" Background="Transparent" Cursor="SizeWE"
-                        MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp"
-                        Panel.ZIndex="10">
-                    <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
-                            Margin="0,0,4,0"/>
+                <!-- Numpad Panel -->
+                <Border x:Name="NumpadPanel" Grid.Column="1" Background="#1a1a1a" Margin="5,0,0,0" CornerRadius="8"
+                        BorderBrush="#333" BorderThickness="1" Visibility="Collapsed">
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <!-- Row 1 -->
+                        <Button Grid.Row="0" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="Num" Tag="NUMLOCK" Click="Numpad_Click"/>
+                        <Button Grid.Row="0" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="/" Tag="DIVIDE" Click="Numpad_Click"/>
+                        <Button Grid.Row="0" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="*" Tag="MULTIPLY" Click="Numpad_Click"/>
+                        <Button Grid.Row="0" Grid.Column="3" Style="{StaticResource KeyButtonStyle}" Content="-" Tag="SUBTRACT" Click="Numpad_Click"/>
+                        
+                        <!-- Row 2 -->
+                        <Button Grid.Row="1" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="7" Tag="NUMPAD7" Click="Numpad_Click"/>
+                        <Button Grid.Row="1" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="8" Tag="NUMPAD8" Click="Numpad_Click"/>
+                        <Button Grid.Row="1" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="9" Tag="NUMPAD9" Click="Numpad_Click"/>
+                        <Button Grid.Row="1" Grid.Column="3" Grid.RowSpan="2" Style="{StaticResource KeyButtonStyle}" Content="+" Tag="ADD" Click="Numpad_Click"/>
+                        
+                        <!-- Row 3 -->
+                        <Button Grid.Row="2" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="4" Tag="NUMPAD4" Click="Numpad_Click"/>
+                        <Button Grid.Row="2" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="5" Tag="NUMPAD5" Click="Numpad_Click"/>
+                        <Button Grid.Row="2" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="6" Tag="NUMPAD6" Click="Numpad_Click"/>
+                        
+                        <!-- Row 4 -->
+                        <Button Grid.Row="3" Grid.Column="0" Style="{StaticResource KeyButtonStyle}" Content="1" Tag="NUMPAD1" Click="Numpad_Click"/>
+                        <Button Grid.Row="3" Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="2" Tag="NUMPAD2" Click="Numpad_Click"/>
+                        <Button Grid.Row="3" Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="3" Tag="NUMPAD3" Click="Numpad_Click"/>
+                        <Button Grid.Row="3" Grid.Column="3" Style="{StaticResource KeyButtonStyle}" Content="⏎" Tag="RETURN" Click="Numpad_Click"/>
+                    </Grid>
                 </Border>
             </Grid>
         </Grid>

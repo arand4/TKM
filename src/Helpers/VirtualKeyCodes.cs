@@ -123,4 +123,57 @@ public static class VirtualKeyCodes
     public const ushort VK_SUBTRACT = 0x6D;
     public const ushort VK_DECIMAL = 0x6E;
     public const ushort VK_DIVIDE = 0x6F;
+    
+    /// <summary>
+    /// Converts a key tag string to its virtual key code
+    /// </summary>
+    public static ushort GetKeyCode(string keyTag)
+    {
+        return keyTag switch
+        {
+            // Letters
+            "A" => VK_A, "B" => VK_B, "C" => VK_C, "D" => VK_D, "E" => VK_E,
+            "F" => VK_F, "G" => VK_G, "H" => VK_H, "I" => VK_I, "J" => VK_J,
+            "K" => VK_K, "L" => VK_L, "M" => VK_M, "N" => VK_N, "O" => VK_O,
+            "P" => VK_P, "Q" => VK_Q, "R" => VK_R, "S" => VK_S, "T" => VK_T,
+            "U" => VK_U, "V" => VK_V, "W" => VK_W, "X" => VK_X, "Y" => VK_Y,
+            "Z" => VK_Z,
+            
+            // Numbers
+            "0" => VK_0, "1" => VK_1, "2" => VK_2, "3" => VK_3, "4" => VK_4,
+            "5" => VK_5, "6" => VK_6, "7" => VK_7, "8" => VK_8, "9" => VK_9,
+            
+            // Function keys
+            "F1" => VK_F1, "F2" => VK_F2, "F3" => VK_F3, "F4" => VK_F4,
+            "F5" => VK_F5, "F6" => VK_F6, "F7" => VK_F7, "F8" => VK_F8,
+            "F9" => VK_F9, "F10" => VK_F10, "F11" => VK_F11, "F12" => VK_F12,
+            
+            // Special keys
+            "ESCAPE" => VK_ESCAPE, "TAB" => VK_TAB, "CAPITAL" => VK_CAPITAL,
+            "LSHIFT" => VK_LSHIFT, "RSHIFT" => VK_RSHIFT,
+            "LCONTROL" => VK_LCONTROL, "RCONTROL" => VK_RCONTROL,
+            "LMENU" => VK_LMENU, "RMENU" => VK_RMENU, "LWIN" => VK_LWIN,
+            "SPACE" => VK_SPACE, "RETURN" => VK_RETURN, "BACK" => VK_BACK,
+            "DELETE" => VK_DELETE, "INSERT" => VK_INSERT,
+            "HOME" => VK_HOME, "END" => VK_END,
+            "PRIOR" => VK_PRIOR, "NEXT" => VK_NEXT,
+            "LEFT" => VK_LEFT, "RIGHT" => VK_RIGHT, "UP" => VK_UP, "DOWN" => VK_DOWN,
+            "NUMLOCK" => VK_NUMLOCK,
+            
+            // OEM keys
+            "OEM_1" => VK_OEM_1, "OEM_2" => VK_OEM_2, "OEM_3" => VK_OEM_3,
+            "OEM_4" => VK_OEM_4, "OEM_5" => VK_OEM_5, "OEM_6" => VK_OEM_6,
+            "OEM_7" => VK_OEM_7, "OEM_PLUS" => VK_OEM_PLUS, "OEM_MINUS" => VK_OEM_MINUS,
+            "OEM_COMMA" => VK_OEM_COMMA, "OEM_PERIOD" => VK_OEM_PERIOD,
+            
+            // Numpad
+            "NUMPAD0" => VK_NUMPAD0, "NUMPAD1" => VK_NUMPAD1, "NUMPAD2" => VK_NUMPAD2,
+            "NUMPAD3" => VK_NUMPAD3, "NUMPAD4" => VK_NUMPAD4, "NUMPAD5" => VK_NUMPAD5,
+            "NUMPAD6" => VK_NUMPAD6, "NUMPAD7" => VK_NUMPAD7, "NUMPAD8" => VK_NUMPAD8,
+            "NUMPAD9" => VK_NUMPAD9, "MULTIPLY" => VK_MULTIPLY, "ADD" => VK_ADD,
+            "SUBTRACT" => VK_SUBTRACT, "DECIMAL" => VK_DECIMAL, "DIVIDE" => VK_DIVIDE,
+            
+            _ => 0
+        };
+    }
 }

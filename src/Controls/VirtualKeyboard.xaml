@@ -5,14 +5,21 @@
     
     <Grid x:Name="KeyboardGrid">
         <Grid.RowDefinitions>
+            <!-- Function row: half height -->
+            <RowDefinition Height="0.5*"/>
+            <!-- Number row -->
             <RowDefinition Height="*"/>
+            <!-- QWERTY row -->
             <RowDefinition Height="*"/>
+            <!-- ASDF row -->
             <RowDefinition Height="*"/>
+            <!-- ZXCV row -->
             <RowDefinition Height="*"/>
+            <!-- Bottom row -->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         
-        <!-- Row 1: Function keys and special keys -->
+        <!-- Row 0: Function keys (half height) -->
         <UniformGrid Grid.Row="0" Rows="1" Margin="2">
             <Button Style="{StaticResource KeyButtonStyle}" Content="Esc" Tag="ESCAPE" Click="Key_Click"/>
             <Button Style="{StaticResource KeyButtonStyle}" Content="F1" Tag="F1" Click="Key_Click"/>
@@ -30,7 +37,7 @@
             <Button Style="{StaticResource KeyButtonStyle}" Content="Del" Tag="DELETE" Click="Key_Click"/>
         </UniformGrid>
         
-        <!-- Row 2: Number row -->
+        <!-- Row 1: Number row -->
         <UniformGrid Grid.Row="1" Rows="1" Margin="2">
             <Button Style="{StaticResource KeyButtonStyle}" Content="`" Tag="OEM_3" Click="Key_Click"/>
             <Button Style="{StaticResource KeyButtonStyle}" Content="1" Tag="1" Click="Key_Click"/>
@@ -48,7 +55,7 @@
             <Button Style="{StaticResource WideKeyButtonStyle}" Content="⌫" Tag="BACK" Click="Key_Click"/>
         </UniformGrid>
         
-        <!-- Row 3: QWERTY row -->
+        <!-- Row 2: QWERTY row -->
         <Grid Grid.Row="2" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.5*"/>
@@ -83,7 +90,7 @@
             <Button Grid.Column="13" Style="{StaticResource KeyButtonStyle}" Content="\" Tag="OEM_5" Click="Key_Click"/>
         </Grid>
         
-        <!-- Row 4: ASDF row -->
+        <!-- Row 3: ASDF row -->
         <Grid Grid.Row="3" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.8*"/>
@@ -116,68 +123,60 @@
             <Button Grid.Column="12" Style="{StaticResource KeyButtonStyle}" Content="Enter" Tag="RETURN" Click="Key_Click"/>
         </Grid>
         
-        <!-- Row 5: ZXCV row + bottom row -->
+        <!-- Row 4: ZXCV row -->
         <Grid Grid.Row="4" Margin="2">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.3*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2.7*"/>
+            </Grid.ColumnDefinitions>
             
-            <!-- ZXCV row -->
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2.3*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="2.7*"/>
-                </Grid.ColumnDefinitions>
-                
-                <Button Grid.Column="0" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="LeftShiftKey" Content="Shift" Tag="LSHIFT" Click="Shift_Click"/>
-                <Button Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="Z" Tag="Z" Click="Key_Click"/>
-                <Button Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="X" Tag="X" Click="Key_Click"/>
-                <Button Grid.Column="3" Style="{StaticResource KeyButtonStyle}" Content="C" Tag="C" Click="Key_Click"/>
-                <Button Grid.Column="4" Style="{StaticResource KeyButtonStyle}" Content="V" Tag="V" Click="Key_Click"/>
-                <Button Grid.Column="5" Style="{StaticResource KeyButtonStyle}" Content="B" Tag="B" Click="Key_Click"/>
-                <Button Grid.Column="6" Style="{StaticResource KeyButtonStyle}" Content="N" Tag="N" Click="Key_Click"/>
-                <Button Grid.Column="7" Style="{StaticResource KeyButtonStyle}" Content="M" Tag="M" Click="Key_Click"/>
-                <Button Grid.Column="8" Style="{StaticResource KeyButtonStyle}" Content="," Tag="OEM_COMMA" Click="Key_Click"/>
-                <Button Grid.Column="9" Style="{StaticResource KeyButtonStyle}" Content="." Tag="OEM_PERIOD" Click="Key_Click"/>
-                <Button Grid.Column="10" Style="{StaticResource KeyButtonStyle}" Content="/" Tag="OEM_2" Click="Key_Click"/>
-                <Button Grid.Column="11" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="RightShiftKey" Content="Shift" Tag="RSHIFT" Click="Shift_Click"/>
-            </Grid>
+            <Button Grid.Column="0" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="LeftShiftKey" Content="Shift" Tag="LSHIFT" Click="Shift_Click"/>
+            <Button Grid.Column="1" Style="{StaticResource KeyButtonStyle}" Content="Z" Tag="Z" Click="Key_Click"/>
+            <Button Grid.Column="2" Style="{StaticResource KeyButtonStyle}" Content="X" Tag="X" Click="Key_Click"/>
+            <Button Grid.Column="3" Style="{StaticResource KeyButtonStyle}" Content="C" Tag="C" Click="Key_Click"/>
+            <Button Grid.Column="4" Style="{StaticResource KeyButtonStyle}" Content="V" Tag="V" Click="Key_Click"/>
+            <Button Grid.Column="5" Style="{StaticResource KeyButtonStyle}" Content="B" Tag="B" Click="Key_Click"/>
+            <Button Grid.Column="6" Style="{StaticResource KeyButtonStyle}" Content="N" Tag="N" Click="Key_Click"/>
+            <Button Grid.Column="7" Style="{StaticResource KeyButtonStyle}" Content="M" Tag="M" Click="Key_Click"/>
+            <Button Grid.Column="8" Style="{StaticResource KeyButtonStyle}" Content="," Tag="OEM_COMMA" Click="Key_Click"/>
+            <Button Grid.Column="9" Style="{StaticResource KeyButtonStyle}" Content="." Tag="OEM_PERIOD" Click="Key_Click"/>
+            <Button Grid.Column="10" Style="{StaticResource KeyButtonStyle}" Content="/" Tag="OEM_2" Click="Key_Click"/>
+            <Button Grid.Column="11" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="RightShiftKey" Content="Shift" Tag="RSHIFT" Click="Shift_Click"/>
+        </Grid>
+        
+        <!-- Row 5: Bottom row (Ctrl, Win, Alt, Space, etc) -->
+        <Grid Grid.Row="5" Margin="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.3*"/>
+                <ColumnDefinition Width="1.3*"/>
+                <ColumnDefinition Width="1.3*"/>
+                <ColumnDefinition Width="6*"/>
+                <ColumnDefinition Width="1.3*"/>
+                <ColumnDefinition Width="1.3*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             
-            <!-- Bottom row: Ctrl, Win, Alt, Space, etc -->
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.3*"/>
-                    <ColumnDefinition Width="1.3*"/>
-                    <ColumnDefinition Width="1.3*"/>
-                    <ColumnDefinition Width="6*"/>
-                    <ColumnDefinition Width="1.3*"/>
-                    <ColumnDefinition Width="1.3*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                
-                <Button Grid.Column="0" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="CtrlKey" Content="Ctrl" Tag="LCONTROL" Click="Ctrl_Click"/>
-                <Button Grid.Column="1" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="WinKey" Content="⊞" Tag="LWIN" Click="Key_Click"/>
-                <Button Grid.Column="2" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="AltKey" Content="Alt" Tag="LMENU" Click="Alt_Click"/>
-                <Button Grid.Column="3" Style="{StaticResource SpaceKeyButtonStyle}" Content="" Tag="SPACE" Click="Key_Click"/>
-                <Button Grid.Column="4" Style="{StaticResource ModifierKeyButtonStyle}" Content="Alt" Tag="RMENU" Click="Alt_Click"/>
-                <Button Grid.Column="5" Style="{StaticResource ModifierKeyButtonStyle}" Content="Ctrl" Tag="RCONTROL" Click="Ctrl_Click"/>
-                <Button Grid.Column="6" Style="{StaticResource KeyButtonStyle}" Content="←" Tag="LEFT" Click="Key_Click"/>
-                <Button Grid.Column="7" Style="{StaticResource KeyButtonStyle}" Content="↑&#x0a;↓" Tag="UPDOWN" Click="UpDown_Click" FontSize="10"/>
-                <Button Grid.Column="8" Style="{StaticResource KeyButtonStyle}" Content="→" Tag="RIGHT" Click="Key_Click"/>
-            </Grid>
+            <Button Grid.Column="0" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="CtrlKey" Content="Ctrl" Tag="LCONTROL" Click="Ctrl_Click"/>
+            <Button Grid.Column="1" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="WinKey" Content="⊞" Tag="LWIN" Click="Key_Click"/>
+            <Button Grid.Column="2" Style="{StaticResource ModifierKeyButtonStyle}" x:Name="AltKey" Content="Alt" Tag="LMENU" Click="Alt_Click"/>
+            <Button Grid.Column="3" Style="{StaticResource SpaceKeyButtonStyle}" Content="" Tag="SPACE" Click="Key_Click"/>
+            <Button Grid.Column="4" Style="{StaticResource ModifierKeyButtonStyle}" Content="Alt" Tag="RMENU" Click="Alt_Click"/>
+            <Button Grid.Column="5" Style="{StaticResource ModifierKeyButtonStyle}" Content="Ctrl" Tag="RCONTROL" Click="Ctrl_Click"/>
+            <Button Grid.Column="6" Style="{StaticResource KeyButtonStyle}" Content="←" Tag="LEFT" Click="Key_Click"/>
+            <Button Grid.Column="7" Style="{StaticResource KeyButtonStyle}" Content="↑&#x0a;↓" Tag="UPDOWN" Click="UpDown_Click" FontSize="10"/>
+            <Button Grid.Column="8" Style="{StaticResource KeyButtonStyle}" Content="→" Tag="RIGHT" Click="Key_Click"/>
         </Grid>
     </Grid>
 </UserControl>
