@@ -36,21 +36,25 @@
             </Grid.RowDefinitions>
             
             <!-- Top Control Bar -->
-            <Border Grid.Row="0" Background="#0d0d0d" BorderBrush="#333" BorderThickness="0,0,0,1"
-                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Border Grid.Row="0" Background="#0d0d0d" BorderBrush="#333" BorderThickness="0,0,0,1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     
-                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                        <TextBlock Text="Touch Keyboard &amp; Mouse" Foreground="#888" FontSize="14" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="PostureStatusText" Text="" Foreground="#666" FontSize="12" 
-                                   VerticalAlignment="Center" Margin="15,0,0,0"/>
-                    </StackPanel>
+                    <!-- Draggable title area -->
+                    <Border Grid.Column="0" Background="Transparent" 
+                            MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                            <TextBlock Text="Touch Keyboard &amp; Mouse" Foreground="#888" FontSize="14" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="PostureStatusText" Text="" Foreground="#666" FontSize="12" 
+                                       VerticalAlignment="Center" Margin="15,0,0,0"/>
+                        </StackPanel>
+                    </Border>
                     
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0"
+                                WindowChrome.IsHitTestVisibleInChrome="True">
                         <!-- Numpad toggle button -->
                         <Button x:Name="NumpadButton" Style="{StaticResource ControlButtonStyle}" 
                                 Content="#" Click="NumpadButton_Click" ToolTip="Toggle Numpad"
@@ -114,10 +118,11 @@
                     </Grid>
                 </Grid>
                 
-                <!-- Numpad Panel -->
+                <!-- Numpad Panel - uses square buttons based on available height -->
                 <Border x:Name="NumpadPanel" Grid.Column="1" Background="#1a1a1a" Margin="5,0,0,0" CornerRadius="8"
-                        BorderBrush="#333" BorderThickness="1" Visibility="Collapsed">
-                    <Grid Margin="5">
+                        BorderBrush="#333" BorderThickness="1" Visibility="Collapsed"
+                        SizeChanged="NumpadPanel_SizeChanged">
+                    <Grid x:Name="NumpadGrid" Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>

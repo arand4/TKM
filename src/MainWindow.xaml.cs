@@ -71,40 +71,52 @@ public partial class MainWindow : Window
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        // Update trackpad width if it was at full width
-        if (_trackpadWasFullWidth)
+        try
         {
-            UpdateTrackpadToFullWidth();
+            // Update trackpad width if it was at full width
+            if (_trackpadWasFullWidth)
+            {
+                UpdateTrackpadToFullWidth();
+            }
         }
+        catch { /* Ignore */ }
     }
     
     private void UpdateTrackpadWidth()
     {
         // Set trackpad to full width on startup
-        UpdateTrackpadToFullWidth();
+        try { UpdateTrackpadToFullWidth(); } catch { }
     }
     
     private void UpdateTrackpadToFullWidth()
     {
-        if (TrackpadArea == null || Trackpad == null || TrackpadWithGrips == null) return;
-        
-        var availableWidth = TrackpadArea.ActualWidth - 24; // Subtract grip widths
-        if (availableWidth > 300)
+        try
         {
-            Trackpad.Width = availableWidth;
-            _trackpadWasFullWidth = true;
+            if (TrackpadArea == null || Trackpad == null || TrackpadWithGrips == null) return;
+        
+            var availableWidth = TrackpadArea.ActualWidth - 24; // Subtract grip widths
+            if (availableWidth > 300)
+            {
+                Trackpad.Width = availableWidth;
+                _trackpadWasFullWidth = true;
+            }
         }
+        catch { /* Ignore */ }
     }
     
     private bool IsTrackpadAtFullWidth()
     {
-        if (TrackpadArea == null || Trackpad == null) return true;
-        
-        var availableWidth = TrackpadArea.ActualWidth - 24;
-        var trackpadWidth = double.IsNaN(Trackpad.Width) ? Trackpad.ActualWidth : Trackpad.Width;
-        
-        // Consider "full width" if within 50 pixels of available
-        return trackpadWidth >= availableWidth - 50;
+        try
+        {
+            if (TrackpadArea == null || Trackpad == null) return true;
+            
+            var availableWidth = TrackpadArea.ActualWidth - 24;
+            var trackpadWidth = double.IsNaN(Trackpad.Width) ? Trackpad.ActualWidth : Trackpad.Width;
+            
+            // Consider "full width" if within 50 pixels of available
+            return trackpadWidth >= availableWidth - 50;
+        }
+        catch { return true; }
     }
 
     private void OnPostureChanged(object? sender, PostureChangedEventArgs e)
@@ -201,27 +213,31 @@ public partial class MainWindow : Window
 
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Key.Escape)
+        try
         {
-            // Close settings sidebar if open, otherwise close app
-            if (SettingsSidebar.Visibility == Visibility.Visible)
+            if (e.Key == Key.Escape)
             {
-                SettingsSidebar.Visibility = Visibility.Collapsed;
+                // Close settings sidebar if open, otherwise close app
+                if (SettingsSidebar.Visibility == Visibility.Visible)
+                {
+                    SettingsSidebar.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    this.Close();
+                }
             }
-            else
+            else if (e.Key == Key.F11)
             {
-                this.Close();
+                ToggleFullscreen();
             }
         }
-        else if (e.Key == Key.F11)
-        {
-            ToggleFullscreen();
-        }
+        catch { /* Ignore */ }
     }
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        ToggleSettings();
+        try { ToggleSettings(); } catch { }
     }
     
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -244,51 +260,75 @@ public partial class MainWindow : Window
     
     private void NumpadButton_Click(object sender, RoutedEventArgs e)
     {
-        _numpadVisible = !_numpadVisible;
-        
-        if (_numpadVisible)
+        try
         {
-            // Remember if trackpad was at full width before showing numpad
-            _trackpadWasFullWidth = IsTrackpadAtFullWidth();
+            _numpadVisible = !_numpadVisible;
             
-            NumpadColumn.Width = new GridLength(200);
-            NumpadPanel.Visibility = Visibility.Visible;
-            NumpadButton.Content = "⌨";
-            
-            // If trackpad was at full width, adjust it to fit the new available space
-            if (_trackpadWasFullWidth)
+            if (_numpadVisible)
             {
-                // Wait for layout to update, then set full width
-                Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
-                    System.Windows.Threading.DispatcherPriority.Loaded);
+                // Remember if trackpad was at full width before showing numpad
+                _trackpadWasFullWidth = IsTrackpadAtFullWidth();
+                
+                NumpadColumn.Width = new GridLength(200);
+                NumpadPanel.Visibility = Visibility.Visible;
+                NumpadButton.Content = "⌨";
+                
+                // If trackpad was at full width, adjust it to fit the new available space
+                if (_trackpadWasFullWidth)
+                {
+                    // Wait for layout to update, then set full width
+                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
+                        System.Windows.Threading.DispatcherPriority.Loaded);
+                }
+            }
+            else
+            {
+                NumpadColumn.Width = new GridLength(0);
+                NumpadPanel.Visibility = Visibility.Collapsed;
+                NumpadButton.Content = "#";
+                
+                // If trackpad was at full width before numpad was shown, restore full width
+                if (_trackpadWasFullWidth)
+                {
+                    // Wait for layout to update, then set full width
+                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
+                        System.Windows.Threading.DispatcherPriority.Loaded);
+                }
             }
         }
-        else
-        {
-            NumpadColumn.Width = new GridLength(0);
-            NumpadPanel.Visibility = Visibility.Collapsed;
-            NumpadButton.Content = "#";
-            
-            // If trackpad was at full width before numpad was shown, restore full width
-            if (_trackpadWasFullWidth)
-            {
-                // Wait for layout to update, then set full width
-                Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
-                    System.Windows.Threading.DispatcherPriority.Loaded);
-            }
-        }
+        catch { /* Ignore */ }
     }
     
     private void Numpad_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is string keyName)
+        try
         {
-            var keyCode = VirtualKeyCodes.GetKeyCode(keyName);
-            if (keyCode != 0)
+            if (sender is Button button && button.Tag is string keyName)
             {
-                InputSimulator.SendKey(keyCode);
+                var keyCode = VirtualKeyCodes.GetKeyCode(keyName);
+                if (keyCode != 0)
+                {
+                    InputSimulator.SendKey(keyCode);
+                }
             }
         }
+        catch { /* Ignore */ }
+    }
+    
+    private void NumpadPanel_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        try
+        {
+            // Make numpad width match its height to keep buttons square
+            // 4 rows of buttons, so width should be height (for 4 columns)
+            if (NumpadPanel != null && NumpadPanel.ActualHeight > 0)
+            {
+                var buttonHeight = (NumpadPanel.ActualHeight - 10) / 4; // 4 rows, minus margins
+                var desiredWidth = (buttonHeight * 4) + 10; // 4 columns of square buttons
+                NumpadColumn.Width = new GridLength(Math.Max(desiredWidth, 150));
+            }
+        }
+        catch { /* Ignore */ }
     }
 
     public void ToggleSettings()
@@ -300,50 +340,54 @@ public partial class MainWindow : Window
 
     private void CloseSettings_Click(object sender, RoutedEventArgs e)
     {
-        SettingsSidebar.Visibility = Visibility.Collapsed;
+        try { SettingsSidebar.Visibility = Visibility.Collapsed; } catch { }
     }
 
     private void FullscreenButton_Click(object sender, RoutedEventArgs e)
     {
-        ToggleFullscreen();
+        try { ToggleFullscreen(); } catch { }
     }
 
     private void ToggleFullscreen()
     {
-        if (_isFullscreen)
+        try
         {
-            // Exit fullscreen
-            this.WindowState = WindowState.Normal;
-            
-            // Set to a reasonable windowed size
-            var workArea = SystemParameters.WorkArea;
-            this.Width = Math.Min(1200, workArea.Width * 0.8);
-            this.Height = Math.Min(700, workArea.Height * 0.8);
-            this.Left = (workArea.Width - this.Width) / 2;
-            this.Top = (workArea.Height - this.Height) / 2;
-            
-            FullscreenButton.Content = "⛶";
-            FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
-            _isFullscreen = false;
+            if (_isFullscreen)
+            {
+                // Exit fullscreen
+                this.WindowState = WindowState.Normal;
+                
+                // Set to a reasonable windowed size
+                var workArea = SystemParameters.WorkArea;
+                this.Width = Math.Min(1200, workArea.Width * 0.8);
+                this.Height = Math.Min(700, workArea.Height * 0.8);
+                this.Left = (workArea.Width - this.Width) / 2;
+                this.Top = (workArea.Height - this.Height) / 2;
+                
+                FullscreenButton.Content = "⛶";
+                FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
+                _isFullscreen = false;
+            }
+            else
+            {
+                // Enter fullscreen
+                this.WindowState = WindowState.Maximized;
+                FullscreenButton.Content = "⧉";
+                FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
+                _isFullscreen = true;
+            }
         }
-        else
-        {
-            // Enter fullscreen
-            this.WindowState = WindowState.Maximized;
-            FullscreenButton.Content = "⧉";
-            FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
-            _isFullscreen = true;
-        }
+        catch { /* Ignore */ }
     }
 
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)
     {
-        this.WindowState = WindowState.Minimized;
+        try { this.WindowState = WindowState.Minimized; } catch { }
     }
 
     private void CloseButton_Click(object sender, RoutedEventArgs e)
     {
-        this.Close();
+        try { this.Close(); } catch { }
     }
 
     #region Settings Handlers
