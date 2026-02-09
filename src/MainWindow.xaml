@@ -29,10 +29,10 @@
             <Grid.RowDefinitions>
                 <!-- Top bar with controls -->
                 <RowDefinition Height="40"/>
-                <!-- Keyboard area -->
-                <RowDefinition Height="*"/>
-                <!-- Trackpad area -->
-                <RowDefinition x:Name="TrackpadRow" Height="200"/>
+                <!-- Keyboard area (2/3 of content) -->
+                <RowDefinition Height="2*"/>
+                <!-- Trackpad area (1/3 of content) -->
+                <RowDefinition x:Name="TrackpadRow" Height="*"/>
             </Grid.RowDefinitions>
             
             <!-- Top Control Bar -->
