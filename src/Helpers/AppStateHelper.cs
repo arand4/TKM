@@ -19,7 +19,7 @@ namespace TouchKeyboardMouse.Helpers
 
     public static class AppStateHelper
     {
-        private static readonly string StateFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "TouchKeyboardMouse", "appstate.json");
+        private static readonly string StateFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appstate.json");
 
         public static void Save(AppState state)
         {
