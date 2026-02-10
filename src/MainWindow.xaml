@@ -55,27 +55,8 @@
                     
                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0"
                                 WindowChrome.IsHitTestVisibleInChrome="True">
-                        <!-- Numpad toggle button -->
-                        <Button x:Name="NumpadButton" Style="{StaticResource ControlButtonStyle}" 
-                                Content="#" Click="NumpadButton_Click" ToolTip="Toggle Numpad"
-                                WindowChrome.IsHitTestVisibleInChrome="True"/>
-                        <!-- Settings toggle button -->
-                        <Button x:Name="SettingsButton" Style="{StaticResource ControlButtonStyle}" 
-                                Content="⚙" Click="SettingsButton_Click" ToolTip="Settings"
-                                WindowChrome.IsHitTestVisibleInChrome="True"/>
-                        <!-- Fullscreen toggle button -->
-                        <Button x:Name="FullscreenButton" Style="{StaticResource ControlButtonStyle}" 
-                                Content="⛶" Click="FullscreenButton_Click" ToolTip="Toggle Fullscreen (F11)"
-                                WindowChrome.IsHitTestVisibleInChrome="True"/>
-                        <!-- Minimize button -->
-                        <Button x:Name="MinimizeButton" Style="{StaticResource ControlButtonStyle}" 
-                                Content="−" Click="MinimizeButton_Click" ToolTip="Minimize"
-                                WindowChrome.IsHitTestVisibleInChrome="True"/>
-                        <!-- Close button -->
-                        <Button x:Name="CloseButton" Style="{StaticResource CloseButtonStyle}" 
-                                Content="✕" Click="CloseButton_Click" ToolTip="Exit (Esc)"
-                                WindowChrome.IsHitTestVisibleInChrome="True"/>
-                    </StackPanel>
+                            <!-- (Window controls moved to vertical toolbar; this area intentionally left blank) -->
+                            </StackPanel>
                 </Grid>
             </Border>
                 <!-- Always-visible vertical toolbar for window controls -->
