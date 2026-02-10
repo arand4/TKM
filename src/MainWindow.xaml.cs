@@ -10,24 +10,7 @@ namespace TouchKeyboardMouse
 {
 public partial class MainWindow : Window
 {
-    // UI controls
-    private Button FullscreenButton;
-    private Button MinimizeButton;
-    private Button CloseButton;
-    private Button SettingsButton;
-    private Button NumpadButton;
-    private TouchKeyboardMouse.Controls.Trackpad Trackpad;
-    private Grid TrackpadArea;
-    private Grid TrackpadWithGrips;
-    private Border SettingsSidebar;
-    private Border NumpadPanel;
-    private ColumnDefinition NumpadColumn;
-    private Grid NumpadGrid;
-    private TouchKeyboardMouse.Controls.VirtualKeyboard Keyboard;
-    private TextBlock PostureStatusText;
-    private TextBlock CursorSensitivityValue;
-    private TextBlock ScrollSensitivityValue;
-    private TextBlock TapThresholdValue;
+    // UI controls are auto-generated from XAML
     // Workaround for WPF/WindowChrome bug: restore interactivity after state change
     private void RestoreTitlebarInteractivity()
     {
@@ -71,18 +54,6 @@ public partial class MainWindow : Window
         }
         catch { /* Ignore */ }
     }
-using System;
-using System.Runtime.InteropServices;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Interop;
-using TouchKeyboardMouse.Helpers;
-
-namespace TouchKeyboardMouse
-{
-public partial class MainWindow : Window
-{
     // Prevent recursive state changes
     private bool _handlingStateChange = false;
 
@@ -620,4 +591,5 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 }
+// Add missing closing brace for namespace
 }
