@@ -72,8 +72,6 @@ public partial class MainWindow : Window
                 Keyboard.Focus();
                 if (Keyboard != null) Keyboard.Focus();
                 if (Trackpad != null) Trackpad.Focus();
-                // Recreate numpad UI after state change
-                RecreateNumpadUI();
             } catch { }
         }
     }
