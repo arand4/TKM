@@ -78,7 +78,14 @@
                     </StackPanel>
                 </Grid>
             </Border>
-            
+                <!-- Always-visible vertical toolbar for window controls -->
+                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8,48,0,0" Width="48" Panel.ZIndex="100">
+                    <Button x:Name="NumpadButton" Style="{StaticResource ControlButtonStyle}" Content="#" Click="NumpadButton_Click" ToolTip="Toggle Numpad" Margin="0,0,0,8"/>
+                    <Button x:Name="SettingsButton" Style="{StaticResource ControlButtonStyle}" Content="⚙" Click="SettingsButton_Click" ToolTip="Settings" Margin="0,0,0,8"/>
+                    <Button x:Name="FullscreenButton" Style="{StaticResource ControlButtonStyle}" Content="⛶" Click="FullscreenButton_Click" ToolTip="Toggle Fullscreen (F11)" Margin="0,0,0,8"/>
+                    <Button x:Name="MinimizeButton" Style="{StaticResource ControlButtonStyle}" Content="−" Click="MinimizeButton_Click" ToolTip="Minimize" Margin="0,0,0,8"/>
+                    <Button x:Name="CloseButton" Style="{StaticResource CloseButtonStyle}" Content="✕" Click="CloseButton_Click" ToolTip="Exit (Esc)"/>
+                </StackPanel>
             <!-- Keyboard -->
             <local:VirtualKeyboard x:Name="Keyboard" Grid.Row="1" Margin="5"/>
             
