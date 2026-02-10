@@ -93,7 +93,14 @@ public partial class MainWindow : Window
         finally
         {
             _handlingStateChange = false;
-            try { RestoreTitlebarInteractivity(); } catch { }
+            try {
+                RestoreTitlebarInteractivity();
+                InvalidateVisual();
+                UpdateLayout();
+                Keyboard.Focus(this);
+                if (Keyboard != null) Keyboard.Focus();
+                if (Trackpad != null) Trackpad.Focus();
+            } catch { }
         }
     }
     // Dynamically update window activation style based on fullscreen/windowed mode
@@ -479,7 +486,14 @@ public partial class MainWindow : Window
         finally
         {
             _handlingStateChange = false;
-            try { RestoreTitlebarInteractivity(); } catch { }
+            try {
+                RestoreTitlebarInteractivity();
+                InvalidateVisual();
+                UpdateLayout();
+                Keyboard.Focus(this);
+                if (Keyboard != null) Keyboard.Focus();
+                if (Trackpad != null) Trackpad.Focus();
+            } catch { }
         }
     }
     // ...existing code...
