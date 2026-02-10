@@ -6,7 +6,6 @@
     <RootNamespace>TouchKeyboardMouse.Windowed</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Page Include="MainWindow.xaml" />
     <ProjectReference Include="../Shared/TouchKeyboardMouse.Shared.csproj" />
   </ItemGroup>
 </Project>
