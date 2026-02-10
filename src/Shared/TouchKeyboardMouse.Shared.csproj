@@ -4,6 +4,7 @@
     <RootNamespace>TouchKeyboardMouse.Shared</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <!-- No explicit Compile includes needed -->
+    <Page Include="Controls/*.xaml" />
+    <Compile Include="Controls/*.xaml.cs" />
   </ItemGroup>
 </Project>
