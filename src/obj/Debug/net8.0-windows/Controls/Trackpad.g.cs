@@ -84,7 +84,7 @@ namespace TouchKeyboardMouse.Controls {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/TouchKeyboardMouse;component/controls/trackpad.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/TouchKeyboardMouse;V1.0.0.0;component/controls/trackpad.xaml", System.UriKind.Relative);
             
             #line 1 "../../../../Controls/Trackpad.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

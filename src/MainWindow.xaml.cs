@@ -252,10 +252,6 @@ public partial class MainWindow : Window
         try { ToggleSettings(); } catch { }
     }
     
-    private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-    {
-        // Drag window if not maximized (optional, or remove entirely)
-    }
     
     private void NumpadButton_Click(object sender, RoutedEventArgs e)
     {
