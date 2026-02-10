@@ -4,7 +4,6 @@
     <RootNamespace>TouchKeyboardMouse.Shared</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AppState.cs" />
-    <Compile Include="AppStateHelper.cs" />
+    <!-- No explicit Compile includes needed -->
   </ItemGroup>
 </Project>
