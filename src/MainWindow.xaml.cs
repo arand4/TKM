@@ -11,65 +11,6 @@ namespace TouchKeyboardMouse
 public partial class MainWindow : Window
 {
     // UI controls are auto-generated from XAML
-    // Workaround for WPF/WindowChrome bug: restore interactivity after state change
-    private void RestoreTitlebarInteractivity()
-    {
-        try
-        {
-            // Detach and reattach event handlers for all main controls
-            if (FullscreenButton != null)
-            {
-                FullscreenButton.Click -= FullscreenButton_Click;
-                FullscreenButton.Click += FullscreenButton_Click;
-                FullscreenButton.IsEnabled = true;
-                FullscreenButton.IsHitTestVisible = true;
-            }
-            if (MinimizeButton != null)
-            {
-                MinimizeButton.Click -= MinimizeButton_Click;
-                MinimizeButton.Click += MinimizeButton_Click;
-                MinimizeButton.IsEnabled = true;
-                MinimizeButton.IsHitTestVisible = true;
-            }
-            if (CloseButton != null)
-            {
-                CloseButton.Click -= CloseButton_Click;
-                CloseButton.Click += CloseButton_Click;
-                CloseButton.IsEnabled = true;
-                CloseButton.IsHitTestVisible = true;
-            }
-            if (SettingsButton != null)
-            {
-                SettingsButton.Click -= SettingsButton_Click;
-                SettingsButton.Click += SettingsButton_Click;
-                SettingsButton.IsEnabled = true;
-                SettingsButton.IsHitTestVisible = true;
-            }
-            if (NumpadButton != null)
-            {
-                NumpadButton.Click -= NumpadButton_Click;
-                NumpadButton.Click += NumpadButton_Click;
-                NumpadButton.IsEnabled = true;
-                NumpadButton.IsHitTestVisible = true;
-            }
-            if (Trackpad != null)
-            {
-                Trackpad.IsEnabled = true;
-                Trackpad.IsHitTestVisible = true;
-            }
-            if (TrackpadArea != null)
-            {
-                TrackpadArea.IsEnabled = true;
-                TrackpadArea.IsHitTestVisible = true;
-            }
-            // Force Dispatcher UI update
-            Dispatcher.Invoke(() => {
-                InvalidateVisual();
-                UpdateLayout();
-            }, System.Windows.Threading.DispatcherPriority.Render);
-        }
-        catch { /* Ignore */ }
-    }
     // Prevent recursive state changes
     private bool _handlingStateChange = false;
 
@@ -126,7 +67,6 @@ public partial class MainWindow : Window
         {
             _handlingStateChange = false;
             try {
-                RestoreTitlebarInteractivity();
                 InvalidateVisual();
                 UpdateLayout();
                 Keyboard.Focus();
@@ -283,7 +223,6 @@ public partial class MainWindow : Window
                     AppStateHelper.Save(_appState);
                 }
             }
-            RestoreTitlebarInteractivity();
         }
         catch { /* Ignore */ }
     }
@@ -542,7 +481,6 @@ public partial class MainWindow : Window
         {
             _handlingStateChange = false;
             try {
-                RestoreTitlebarInteractivity();
                 InvalidateVisual();
                 UpdateLayout();
                 Keyboard.Focus();
@@ -654,11 +592,10 @@ public partial class MainWindow : Window
                 _appState.TrackpadWidth = newWidth;
                 AppStateHelper.Save(_appState);
             }
-            try { RestoreTitlebarInteractivity(); } catch { }
         }
         catch { /* Ignore resize errors */ }
         // After toggling fullscreen, refresh layout and controls
-        try { InvalidateVisual(); UpdateLayout(); RestoreTitlebarInteractivity(); } catch { }
+        try { InvalidateVisual(); UpdateLayout(); } catch { }
     }
     
     #endregion
