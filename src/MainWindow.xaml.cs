@@ -586,6 +586,7 @@ public partial class MainWindow : Window
                 try { RestoreTitlebarInteractivity(); } catch { }
             }
             catch { /* Ignore resize errors */ }
+        }
     }
     
     #endregion
