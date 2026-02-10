@@ -63,19 +63,24 @@ public partial class MainWindow : Window
         _handlingStateChange = true;
         try
         {
+            // Only update IsFullscreen if the state actually changed
             if (this.WindowState == WindowState.Maximized && !IsFullscreen)
             {
-                // User maximized window, treat as fullscreen
                 IsFullscreen = true;
-                FullscreenButton.Content = "⧉";
-                FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
+                if (FullscreenButton != null)
+                {
+                    FullscreenButton.Content = "⧉";
+                    FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
+                }
             }
             else if (this.WindowState == WindowState.Normal && IsFullscreen)
             {
-                // User restored window, treat as windowed
                 IsFullscreen = false;
-                FullscreenButton.Content = "⛶";
-                FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
+                if (FullscreenButton != null)
+                {
+                    FullscreenButton.Content = "⛶";
+                    FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
+                }
             }
             if (_appState != null)
             {
@@ -84,10 +89,11 @@ public partial class MainWindow : Window
             }
             this.UpdateWindowActivationStyle();
         }
+        catch { /* Ignore state change errors */ }
         finally
         {
             _handlingStateChange = false;
-            RestoreTitlebarInteractivity();
+            try { RestoreTitlebarInteractivity(); } catch { }
         }
     }
     // Dynamically update window activation style based on fullscreen/windowed mode
@@ -431,6 +437,8 @@ public partial class MainWindow : Window
 
     private void ToggleFullscreen()
     {
+        if (_handlingStateChange) return;
+        _handlingStateChange = true;
         try
         {
             if (IsFullscreen)
@@ -442,16 +450,22 @@ public partial class MainWindow : Window
                 this.Height = Math.Min(700, workArea.Height * 0.8);
                 this.Left = (workArea.Width - this.Width) / 2;
                 this.Top = (workArea.Height - this.Height) / 2;
-                FullscreenButton.Content = "⛶";
-                FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
+                if (FullscreenButton != null)
+                {
+                    FullscreenButton.Content = "⛶";
+                    FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
+                }
                 IsFullscreen = false;
             }
             else
             {
                 // Enter fullscreen
                 this.WindowState = WindowState.Maximized;
-                FullscreenButton.Content = "⧉";
-                FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
+                if (FullscreenButton != null)
+                {
+                    FullscreenButton.Content = "⧉";
+                    FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
+                }
                 IsFullscreen = true;
             }
             if (_appState != null)
@@ -459,10 +473,14 @@ public partial class MainWindow : Window
                 _appState.IsFullscreen = IsFullscreen;
                 AppStateHelper.Save(_appState);
             }
+            this.UpdateWindowActivationStyle();
         }
-        catch { /* Ignore */ }
-        this.UpdateWindowActivationStyle();
-        RestoreTitlebarInteractivity();
+        catch { /* Ignore fullscreen toggle errors */ }
+        finally
+        {
+            _handlingStateChange = false;
+            try { RestoreTitlebarInteractivity(); } catch { }
+        }
     }
     // ...existing code...
 
@@ -549,28 +567,25 @@ public partial class MainWindow : Window
             {
                 // Left grip: moving left increases width, moving right decreases
                 delta = _resizeStartPoint.X - currentPoint.X;
-            }
-            else
+            try
             {
-                // Right grip: moving right increases width, moving left decreases
-                delta = currentPoint.X - _resizeStartPoint.X;
+                // Defensive: check controls before using
+                if (TrackpadArea != null && Trackpad != null && _trackpadWasFullWidth)
+                {
+                    UpdateTrackpadToFullWidth();
+                }
+                // Save window size and position
+                if (this.WindowState == WindowState.Normal && _appState != null)
+                {
+                    _appState.WindowWidth = this.Width;
+                    _appState.WindowHeight = this.Height;
+                    _appState.WindowLeft = this.Left;
+                    _appState.WindowTop = this.Top;
+                    AppStateHelper.Save(_appState);
+                }
+                try { RestoreTitlebarInteractivity(); } catch { }
             }
-            // Apply symmetrical resize (delta applies to BOTH sides)
-            var newWidth = _resizeStartWidth + (delta * 2);
-            // Clamp to valid range
-            var minWidth = 300.0;
-            var maxWidth = TrackpadArea.ActualWidth - 24; // Account for grip widths
-            if (maxWidth <= minWidth) return;
-            newWidth = Math.Max(minWidth, Math.Min(maxWidth, newWidth));
-            Trackpad.Width = newWidth;
-            _trackpadWasFullWidth = false; // User is manually resizing
-            if (_appState != null)
-            {
-                _appState.TrackpadWidth = newWidth;
-                AppStateHelper.Save(_appState);
-            }
-            e.Handled = true;
-        }
+            catch { /* Ignore resize errors */ }
         catch { /* Ignore resize errors */ }
     }
     
