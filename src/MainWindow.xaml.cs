@@ -6,10 +6,119 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using TouchKeyboardMouse.Helpers;
 
-namespace TouchKeyboardMouse;
+namespace TouchKeyboardMouse
+{
+public partial class MainWindow : Window
+    // UI controls
+    private Button FullscreenButton;
+    private Button MinimizeButton;
+    private Button CloseButton;
+    private Button SettingsButton;
+    private Button NumpadButton;
+    private TouchKeyboardMouse.Controls.Trackpad Trackpad;
+    private Grid TrackpadArea;
+    private Grid TrackpadWithGrips;
+    private Border SettingsSidebar;
+    private Border NumpadPanel;
+    private ColumnDefinition NumpadColumn;
+    private Grid NumpadGrid;
+    private TouchKeyboardMouse.Controls.VirtualKeyboard Keyboard;
+    private TextBlock PostureStatusText;
+    private TextBlock CursorSensitivityValue;
+    private TextBlock ScrollSensitivityValue;
+    private TextBlock TapThresholdValue;
+{
+    // Workaround for WPF/WindowChrome bug: restore interactivity after state change
+    private void RestoreTitlebarInteractivity()
+    {
+        try
+        {
+            if (FullscreenButton != null)
+            {
+                FullscreenButton.IsEnabled = true;
+                FullscreenButton.IsHitTestVisible = true;
+            }
+            if (MinimizeButton != null)
+            {
+                MinimizeButton.IsEnabled = true;
+                MinimizeButton.IsHitTestVisible = true;
+            }
+            if (CloseButton != null)
+            {
+                CloseButton.IsEnabled = true;
+                CloseButton.IsHitTestVisible = true;
+            }
+            if (SettingsButton != null)
+            {
+                SettingsButton.IsEnabled = true;
+                SettingsButton.IsHitTestVisible = true;
+            }
+            if (NumpadButton != null)
+            {
+                NumpadButton.IsEnabled = true;
+                NumpadButton.IsHitTestVisible = true;
+            }
+            if (Trackpad != null)
+            {
+                Trackpad.IsEnabled = true;
+                Trackpad.IsHitTestVisible = true;
+            }
+            if (TrackpadArea != null)
+            {
+                TrackpadArea.IsEnabled = true;
+                TrackpadArea.IsHitTestVisible = true;
+            }
+        }
+        catch { /* Ignore */ }
+    }
+using System;
+using System.Runtime.InteropServices;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Interop;
+using TouchKeyboardMouse.Helpers;
 
+namespace TouchKeyboardMouse
+{
 public partial class MainWindow : Window
 {
+    // Prevent recursive state changes
+    private bool _handlingStateChange = false;
+
+    private void MainWindow_StateChanged(object? sender, EventArgs e)
+    {
+        if (_handlingStateChange) return;
+        _handlingStateChange = true;
+        try
+        {
+            if (this.WindowState == WindowState.Maximized && !IsFullscreen)
+            {
+                // User maximized window, treat as fullscreen
+                IsFullscreen = true;
+                FullscreenButton.Content = "⧉";
+                FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
+            }
+            else if (this.WindowState == WindowState.Normal && IsFullscreen)
+            {
+                // User restored window, treat as windowed
+                IsFullscreen = false;
+                FullscreenButton.Content = "⛶";
+                FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
+            }
+            if (_appState != null)
+            {
+                _appState.IsFullscreen = IsFullscreen;
+                AppStateHelper.Save(_appState);
+            }
+            this.UpdateWindowActivationStyle();
+        }
+        finally
+        {
+            _handlingStateChange = false;
+            RestoreTitlebarInteractivity();
+        }
+    }
     // Dynamically update window activation style based on fullscreen/windowed mode
     public void UpdateWindowActivationStyle()
     {
@@ -121,11 +230,10 @@ public partial class MainWindow : Window
         _trayIconManager = new TrayIconManager(this);
 
         // Initialize dual-screen detection
-        _dualScreenHelper = new DualScreenHelper();
-        _dualScreenHelper.PostureChanged += OnPostureChanged;
 
         // Handle window resize to update resize grips position
         this.SizeChanged += MainWindow_SizeChanged;
+        this.StateChanged += MainWindow_StateChanged;
 
         // Mark settings as initialized (prevents slider events during load)
         _settingsInitialized = true;
@@ -134,7 +242,6 @@ public partial class MainWindow : Window
         UpdateTrackpadWidth();
 
         // Initial positioning based on current posture
-        UpdateWindowForPosture();
     }
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -158,6 +265,7 @@ public partial class MainWindow : Window
                     AppStateHelper.Save(_appState);
                 }
             }
+            RestoreTitlebarInteractivity();
         }
         catch { /* Ignore */ }
     }
@@ -199,60 +307,7 @@ public partial class MainWindow : Window
         catch { return true; }
     }
 
-    private void OnPostureChanged(object? sender, PostureChangedEventArgs e)
-    {
-        // Run on UI thread
-        Dispatcher.Invoke(() =>
-        {
-            UpdateWindowForPosture();
-        });
-    }
 
-    private void UpdateWindowForPosture()
-    {
-        if (_dualScreenHelper == null) return;
-
-        var posture = _dualScreenHelper.CurrentPosture;
-        var arrangement = _dualScreenHelper.CurrentArrangement;
-
-        // Update status in title bar
-        UpdatePostureIndicator(posture, arrangement);
-
-        if (_dualScreenHelper.ShouldShowKeyboard())
-        {
-            // Book mode - show keyboard on bottom screen
-            var keyboardScreen = _dualScreenHelper.GetKeyboardScreen();
-            if (keyboardScreen != null && IsFullscreen)
-            {
-                PositionOnScreen(keyboardScreen);
-            }
-            if (_isHiddenDueToPosture)
-            {
-                this.Show();
-                _isHiddenDueToPosture = false;
-            }
-        }
-        else if (posture == DevicePosture.LaptopMode)
-        {
-            // Side-by-side mode - hide the keyboard
-            _isHiddenDueToPosture = true;
-            this.Hide();
-        }
-        else if (posture == DevicePosture.SingleScreen)
-        {
-            // Single screen - show on that screen (user might want virtual keyboard anyway)
-            var screens = _dualScreenHelper.GetScreens();
-            if (screens.Count > 0 && IsFullscreen)
-            {
-                PositionOnScreen(screens[0]);
-            }
-            if (_isHiddenDueToPosture)
-            {
-                this.Show();
-                _isHiddenDueToPosture = false;
-            }
-        }
-    }
 
     private void PositionOnScreen(ScreenInfo screen)
     {
@@ -265,21 +320,6 @@ public partial class MainWindow : Window
             this.WindowState = WindowState.Maximized;
     }
 
-    private void UpdatePostureIndicator(DevicePosture posture, ScreenArrangement arrangement)
-    {
-        // Update UI with current posture
-        var postureText = posture switch
-        {
-            DevicePosture.BookMode => "📖 Book Mode",
-            DevicePosture.LaptopMode => "💻 Side-by-Side",
-            DevicePosture.SingleScreen => "🖥️ Single Screen",
-            _ => ""
-        };
-        PostureStatusText.Text = postureText;
-
-        // Update system tray icon with current posture
-        _trayIconManager?.UpdatePostureStatus(posture, arrangement);
-    }
 
     private void MainWindow_KeyDown(object sender, KeyEventArgs e)
     {
@@ -451,6 +491,7 @@ public partial class MainWindow : Window
         }
         catch { /* Ignore */ }
         this.UpdateWindowActivationStyle();
+        RestoreTitlebarInteractivity();
     }
     // ...existing code...
 
@@ -573,14 +614,10 @@ public partial class MainWindow : Window
     protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
     {
         // Cleanup
-        if (_dualScreenHelper != null)
-        {
-            _dualScreenHelper.PostureChanged -= OnPostureChanged;
-            _dualScreenHelper.Dispose();
-        }
 
         _trayIconManager?.Dispose();
         
         base.OnClosing(e);
     }
+}
 }
