@@ -332,8 +332,6 @@ public partial class MainWindow : Window
             _numpadVisible = !_numpadVisible;
             if (_numpadVisible)
             {
-                // Recreate numpad UI elements and event handlers
-                RecreateNumpadUI();
                 NumpadColumn.Width = new GridLength(200);
                 NumpadPanel.Visibility = Visibility.Visible;
                 NumpadButton.Content = "⌨";
@@ -358,34 +356,6 @@ public partial class MainWindow : Window
         // ...existing code...
     }
 
-    // Recreate numpad UI elements and event handlers to avoid stale references after window state changes
-    void RecreateNumpadUI()
-    {
-        if (NumpadGrid == null) return;
-        NumpadGrid.Children.Clear();
-        NumpadGrid.RowDefinitions.Clear();
-        NumpadGrid.ColumnDefinitions.Clear();
-        // 4 rows, 4 columns
-        for (int r = 0; r < 4; r++) NumpadGrid.RowDefinitions.Add(new RowDefinition());
-        for (int c = 0; c < 4; c++) NumpadGrid.ColumnDefinitions.Add(new ColumnDefinition());
-        string[,] keys = new string[4,4] {
-            { "7", "8", "9", "/" },
-            { "4", "5", "6", "*" },
-            { "1", "2", "3", "-" },
-            { "0", ".", "=", "+" }
-        };
-        for (int r = 0; r < 4; r++)
-        {
-            for (int c = 0; c < 4; c++)
-            {
-                var btn = new Button { Content = keys[r,c], Tag = keys[r,c], Margin = new Thickness(2) };
-                btn.Click += Numpad_Click;
-                Grid.SetRow(btn, r);
-                Grid.SetColumn(btn, c);
-                NumpadGrid.Children.Add(btn);
-            }
-        }
-    }
     
     private void Numpad_Click(object sender, RoutedEventArgs e)
     {
