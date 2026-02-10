@@ -21,7 +21,23 @@ public partial class MainWindow : Window
             // Restore numpad visibility and column width
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
             NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
-            TouchKeyboardMouse.Helpers.AppLogger.Log($"MainWindow_StateChanged: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}");
+            if (TrackpadArea != null && Trackpad != null && TrackpadWithGrips != null)
+            {
+                var availableWidth = TrackpadArea.ActualWidth - 24;
+                if (availableWidth > 300)
+                {
+                    Trackpad.Width = availableWidth;
+                }
+                TrackpadWithGrips.UpdateLayout();
+                TrackpadArea.UpdateLayout();
+                Trackpad.UpdateLayout();
+                TrackpadWithGrips.InvalidateVisual();
+                TrackpadArea.InvalidateVisual();
+                Trackpad.InvalidateVisual();
+            }
+            UpdateLayout();
+            InvalidateVisual();
+            TouchKeyboardMouse.Helpers.AppLogger.Log($"MainWindow_StateChanged: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}, Trackpad.Width={Trackpad.Width}, Trackpad.ActualWidth={Trackpad.ActualWidth}");
             // Restore settings sidebar visibility
             SettingsSidebar.Visibility = SettingsSidebar.Visibility;
             // Re-attach resize event handlers if needed
@@ -37,9 +53,6 @@ public partial class MainWindow : Window
             RightResizeGrip.MouseDown += ResizeGrip_MouseDown;
             RightResizeGrip.MouseMove += ResizeGrip_MouseMove;
             RightResizeGrip.MouseUp += ResizeGrip_MouseUp;
-            // Force layout refresh
-            InvalidateVisual();
-            UpdateLayout();
         }
         catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "MainWindow_StateChanged"); }
     }
@@ -251,7 +264,24 @@ public partial class MainWindow : Window
             _numpadVisible = !_numpadVisible;
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
             NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
-            TouchKeyboardMouse.Helpers.AppLogger.Log($"NumpadButton_Click: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}");
+            // Force trackpad to recalculate width/layout
+            if (TrackpadArea != null && Trackpad != null && TrackpadWithGrips != null)
+            {
+                var availableWidth = TrackpadArea.ActualWidth - 24;
+                if (availableWidth > 300)
+                {
+                    Trackpad.Width = availableWidth;
+                }
+                TrackpadWithGrips.UpdateLayout();
+                TrackpadArea.UpdateLayout();
+                Trackpad.UpdateLayout();
+                TrackpadWithGrips.InvalidateVisual();
+                TrackpadArea.InvalidateVisual();
+                Trackpad.InvalidateVisual();
+            }
+            UpdateLayout();
+            InvalidateVisual();
+            TouchKeyboardMouse.Helpers.AppLogger.Log($"NumpadButton_Click: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}, Trackpad.Width={Trackpad.Width}, Trackpad.ActualWidth={Trackpad.ActualWidth}");
             // Animate or update layout if needed
             if (_numpadVisible)
             {
