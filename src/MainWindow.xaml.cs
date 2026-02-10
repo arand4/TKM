@@ -175,15 +175,15 @@ public partial class MainWindow : Window
         try
         {
             if (TrackpadArea == null || Trackpad == null || TrackpadWithGrips == null) return;
-        
             var availableWidth = TrackpadArea.ActualWidth - 24; // Subtract grip widths
             if (availableWidth > 300)
             {
                 Trackpad.Width = availableWidth;
                 _trackpadWasFullWidth = true;
+                TouchKeyboardMouse.Helpers.AppLogger.Log($"UpdateTrackpadToFullWidth: availableWidth={availableWidth}, Trackpad.Width={Trackpad.Width}, Trackpad.ActualWidth={Trackpad.ActualWidth}");
             }
         }
-        catch { /* Ignore */ }
+        catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "UpdateTrackpadToFullWidth"); }
     }
     
     private bool IsTrackpadAtFullWidth()
