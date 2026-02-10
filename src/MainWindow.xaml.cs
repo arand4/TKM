@@ -5,12 +5,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using TouchKeyboardMouse.Helpers;
-
 namespace TouchKeyboardMouse
 {
-public partial class MainWindow : Window
+    public partial class MainWindow : Window
+    {
     private System.Windows.Threading.DispatcherTimer? _uiHeartbeatTimer;
-{
     // UI controls are auto-generated from XAML
     // No custom activation or fullscreen logic needed
     private bool _settingsInitialized = false;
@@ -88,19 +87,6 @@ public partial class MainWindow : Window
         try { this.Close(); } catch { }
     }
 
-    private void ResizeGrip_MouseUp(object sender, MouseButtonEventArgs e)
-    {
-        try
-        {
-            if (_isResizingTrackpad)
-            {
-                _isResizingTrackpad = false;
-                (sender as Border)?.ReleaseMouseCapture();
-                e.Handled = true;
-            }
-        }
-        catch { /* Ignore */ }
-    }
     // Keep window from being focused to allow typing in other apps
     private const int GWL_EXSTYLE = -20;
     // Removed custom window style constants and interop
@@ -447,21 +433,53 @@ public partial class MainWindow : Window
         {
             TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseDown: START");
             if (TrackpadArea == null || Trackpad == null) return;
-            
             _isResizingTrackpad = true;
             _resizeStartPoint = e.GetPosition(TrackpadArea);
             _resizeStartWidth = Trackpad.Width;
-            
             if (double.IsNaN(_resizeStartWidth))
                 _resizeStartWidth = Trackpad.ActualWidth;
             if (_resizeStartWidth <= 0)
                 _resizeStartWidth = TrackpadArea.ActualWidth - 24;
-                
             (sender as Border)?.CaptureMouse();
             e.Handled = true;
             TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseDown: END");
         }
         catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "ResizeGrip_MouseDown"); }
+    }
+
+    private void ResizeGrip_MouseMove(object sender, MouseEventArgs e)
+    {
+        try
+        {
+            if (!_isResizingTrackpad || TrackpadArea == null || Trackpad == null) return;
+            var currentPoint = e.GetPosition(TrackpadArea);
+            var isLeftGrip = sender == LeftResizeGrip;
+            double delta = 0;
+            if (isLeftGrip)
+            {
+                delta = _resizeStartPoint.X - currentPoint.X;
+            }
+            else
+            {
+                delta = currentPoint.X - _resizeStartPoint.X;
+            }
+            double newWidth = Math.Max(200, _resizeStartWidth + delta);
+            var maxWidth = TrackpadArea.ActualWidth - 24;
+            if (maxWidth > 200) newWidth = Math.Min(newWidth, maxWidth);
+            Trackpad.Width = newWidth;
+            _trackpadWasFullWidth = false;
+            if (_appState != null)
+            {
+                _appState.TrackpadWidth = newWidth;
+                AppStateHelper.Save(_appState);
+            }
+        }
+        catch { /* Ignore resize errors */ }
+        try { InvalidateVisual(); UpdateLayout(); } catch { }
+    }
+
+    private void ResizeGrip_MouseUp(object sender, MouseButtonEventArgs e)
+    {
         try
         {
             TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseUp: START");
@@ -474,36 +492,9 @@ public partial class MainWindow : Window
             TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseUp: END");
         }
         catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "ResizeGrip_MouseUp"); }
-            double delta = 0;
-            if (isLeftGrip)
-            {
-                // Left grip: moving left increases width, moving right decreases
-                delta = _resizeStartPoint.X - currentPoint.X;
-            }
-            else
-            {
-                // Right grip: moving right increases width, moving left decreases
-                delta = currentPoint.X - _resizeStartPoint.X;
-            }
-            // Calculate new width
-            double newWidth = Math.Max(200, _resizeStartWidth + delta);
-            var maxWidth = TrackpadArea.ActualWidth - 24; // Account for grip widths
-            if (maxWidth > 200) newWidth = Math.Min(newWidth, maxWidth);
-            Trackpad.Width = newWidth;
-            _trackpadWasFullWidth = false; // User is manually resizing
-            // Save trackpad width
-            if (_appState != null)
-            {
-                _appState.TrackpadWidth = newWidth;
-                AppStateHelper.Save(_appState);
-            }
-        }
-        catch { /* Ignore resize errors */ }
-        // After toggling fullscreen, refresh layout and controls
-        try { InvalidateVisual(); UpdateLayout(); } catch { }
+
     }
-    
-    #endregion
+#endregion
 
     // Prevent window from being activated when clicking
     protected override void OnActivated(EventArgs e)
@@ -520,5 +511,6 @@ public partial class MainWindow : Window
         base.OnClosing(e);
     }
 }
-// Add missing closing brace for namespace
+// End of MainWindow class
 }
+// End of namespace TouchKeyboardMouse
