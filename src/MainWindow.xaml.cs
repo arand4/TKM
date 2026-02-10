@@ -12,6 +12,11 @@ public partial class MainWindow : Window
 {
     // UI controls are auto-generated from XAML
     // No custom activation or fullscreen logic needed
+    private bool _settingsInitialized = false;
+    private bool _numpadVisible = false;
+    private bool _trackpadWasFullWidth = true;
+    // Store previous trackpad width for numpad toggling
+    private double? _trackpadPreviousWidth = null;
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
@@ -100,9 +105,6 @@ public partial class MainWindow : Window
     // Removed IsFullscreen property
 
     // ...existing code...
-    private bool _settingsInitialized = false;
-    private bool _numpadVisible = false;
-    private bool _trackpadWasFullWidth = true;
     
     // Trackpad resize state
     private bool _isResizingTrackpad = false;
@@ -274,13 +276,22 @@ public partial class MainWindow : Window
                 double availableWidth = TrackpadArea.ActualWidth - 24;
                 if (_numpadVisible)
                 {
-                    // Always snap trackpad to exactly the available width when numpad is shown
+                    if (Trackpad.Width > availableWidth)
+                        _trackpadPreviousWidth = Trackpad.Width;
                     Trackpad.Width = Math.Max(availableWidth, 300);
                 }
                 else
                 {
-                    // When numpad is hidden, trackpad should fill all available space
-                    Trackpad.Width = double.NaN; // Auto
+                    // Restore previous width if it was stored, else keep current width
+                    if (_trackpadPreviousWidth.HasValue)
+                    {
+                        Trackpad.Width = _trackpadPreviousWidth.Value;
+                        _trackpadPreviousWidth = null;
+                    }
+                    else
+                    {
+                        Trackpad.Width = Trackpad.Width; // No change
+                    }
                 }
                 Trackpad.UpdateLayout();
                 TrackpadWithGrips.InvalidateVisual();
