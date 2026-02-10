@@ -98,9 +98,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="12"/>
                         </Grid.ColumnDefinitions>
-                        
                         <!-- Left resize grip -->
-                            <!-- Removed buttons from title bar, added to vertical toolbar -->
+                        <Border Grid.Column="0" x:Name="LeftResizeGrip" Background="Transparent" Cursor="SizeWE"
                                 MouseDown="ResizeGrip_MouseDown" MouseMove="ResizeGrip_MouseMove" MouseUp="ResizeGrip_MouseUp">
                             <Border Width="4" Height="50" Background="#444" CornerRadius="2" VerticalAlignment="Center"
                                     HorizontalAlignment="Right"/>
