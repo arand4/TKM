@@ -18,8 +18,10 @@ public partial class MainWindow : Window
         // Re-apply event handlers and visibility for controls after state change
         try
         {
-            // Restore numpad visibility
+            // Restore numpad visibility and column width
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
+            NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
+            TouchKeyboardMouse.Helpers.AppLogger.Log($"MainWindow_StateChanged: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}");
             // Restore settings sidebar visibility
             SettingsSidebar.Visibility = SettingsSidebar.Visibility;
             // Re-attach resize event handlers if needed
@@ -39,7 +41,7 @@ public partial class MainWindow : Window
             InvalidateVisual();
             UpdateLayout();
         }
-        catch { /* Ignore */ }
+        catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "MainWindow_StateChanged"); }
     }
     // Dynamically update window activation style based on fullscreen/windowed mode
     public void UpdateWindowActivationStyle()
@@ -248,6 +250,8 @@ public partial class MainWindow : Window
         {
             _numpadVisible = !_numpadVisible;
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
+            NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
+            TouchKeyboardMouse.Helpers.AppLogger.Log($"NumpadButton_Click: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}");
             // Animate or update layout if needed
             if (_numpadVisible)
             {
@@ -266,7 +270,7 @@ public partial class MainWindow : Window
                 AppStateHelper.Save(_appState);
             }
         }
-        catch { /* Ignore */ }
+        catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "NumpadButton_Click"); }
     }
 
     
