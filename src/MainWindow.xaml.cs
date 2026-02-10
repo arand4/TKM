@@ -265,20 +265,23 @@ public partial class MainWindow : Window
             _numpadVisible = !_numpadVisible;
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
             NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
+
+            // Always set trackpad width explicitly to avoid layout bugs
             if (TrackpadArea != null && Trackpad != null && TrackpadWithGrips != null)
             {
+                TrackpadWithGrips.UpdateLayout();
+                TrackpadArea.UpdateLayout();
+                double availableWidth = TrackpadArea.ActualWidth - 24;
                 if (_numpadVisible)
                 {
-                    var availableWidth = TrackpadArea.ActualWidth - 24;
-                    if (availableWidth > 300)
-                        Trackpad.Width = availableWidth;
+                    // Always snap trackpad to exactly the available width when numpad is shown
+                    Trackpad.Width = Math.Max(availableWidth, 300);
                 }
                 else
                 {
-                    Trackpad.Width = double.NaN; // Auto, fill all available space
+                    // When numpad is hidden, trackpad should fill all available space
+                    Trackpad.Width = double.NaN; // Auto
                 }
-                TrackpadWithGrips.UpdateLayout();
-                TrackpadArea.UpdateLayout();
                 Trackpad.UpdateLayout();
                 TrackpadWithGrips.InvalidateVisual();
                 TrackpadArea.InvalidateVisual();
@@ -287,16 +290,6 @@ public partial class MainWindow : Window
             UpdateLayout();
             InvalidateVisual();
             TouchKeyboardMouse.Helpers.AppLogger.Log($"NumpadButton_Click: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}, Trackpad.Width={Trackpad.Width}, Trackpad.ActualWidth={Trackpad.ActualWidth}");
-            if (_numpadVisible)
-            {
-                NumpadPanel.Visibility = Visibility.Visible;
-                NumpadPanel.UpdateLayout();
-                NumpadPanel.InvalidateVisual();
-            }
-            else
-            {
-                NumpadPanel.Visibility = Visibility.Collapsed;
-            }
             if (_appState != null)
             {
                 _appState.NumpadVisible = _numpadVisible;
