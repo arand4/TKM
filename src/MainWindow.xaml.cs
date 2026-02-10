@@ -104,6 +104,8 @@ public partial class MainWindow : Window
                 AppStateHelper.Save(_appState);
             }
             this.UpdateWindowActivationStyle();
+            // Recreate numpad UI after window state change
+            RecreateNumpadUI();
         }
         catch { /* Ignore state change errors */ }
         finally
@@ -116,6 +118,8 @@ public partial class MainWindow : Window
                 Keyboard.Focus();
                 if (Keyboard != null) Keyboard.Focus();
                 if (Trackpad != null) Trackpad.Focus();
+                // Recreate numpad UI after state change
+                RecreateNumpadUI();
             } catch { }
         }
     }
@@ -373,22 +377,17 @@ public partial class MainWindow : Window
         try
         {
             _numpadVisible = !_numpadVisible;
-            
             if (_numpadVisible)
             {
-                // Remember if trackpad was at full width before showing numpad
-                _trackpadWasFullWidth = IsTrackpadAtFullWidth();
-                
+                // Recreate numpad UI elements and event handlers
+                RecreateNumpadUI();
                 NumpadColumn.Width = new GridLength(200);
                 NumpadPanel.Visibility = Visibility.Visible;
                 NumpadButton.Content = "⌨";
-                
-                // If trackpad was at full width, adjust it to fit the new available space
+                _trackpadWasFullWidth = IsTrackpadAtFullWidth();
                 if (_trackpadWasFullWidth)
                 {
-                    // Wait for layout to update, then set full width
-                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
-                        System.Windows.Threading.DispatcherPriority.Loaded);
+                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), System.Windows.Threading.DispatcherPriority.Loaded);
                 }
             }
             else
@@ -396,17 +395,41 @@ public partial class MainWindow : Window
                 NumpadColumn.Width = new GridLength(0);
                 NumpadPanel.Visibility = Visibility.Collapsed;
                 NumpadButton.Content = "#";
-                
-                // If trackpad was at full width before numpad was shown, restore full width
                 if (_trackpadWasFullWidth)
                 {
-                    // Wait for layout to update, then set full width
-                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), 
-                        System.Windows.Threading.DispatcherPriority.Loaded);
+                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), System.Windows.Threading.DispatcherPriority.Loaded);
                 }
             }
         }
         catch { /* Ignore */ }
+        // Recreate numpad UI elements and event handlers to avoid stale references after window state changes
+        private void RecreateNumpadUI()
+        {
+            if (NumpadGrid == null) return;
+            NumpadGrid.Children.Clear();
+            NumpadGrid.RowDefinitions.Clear();
+            NumpadGrid.ColumnDefinitions.Clear();
+            // 4 rows, 4 columns
+            for (int r = 0; r < 4; r++) NumpadGrid.RowDefinitions.Add(new RowDefinition());
+            for (int c = 0; c < 4; c++) NumpadGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            string[,] keys = new string[4,4] {
+                { "7", "8", "9", "/" },
+                { "4", "5", "6", "*" },
+                { "1", "2", "3", "-" },
+                { "0", ".", "=", "+" }
+            };
+            for (int r = 0; r < 4; r++)
+            {
+                for (int c = 0; c < 4; c++)
+                {
+                    var btn = new Button { Content = keys[r,c], Tag = keys[r,c], Margin = new Thickness(2) };
+                    btn.Click += Numpad_Click;
+                    Grid.SetRow(btn, r);
+                    Grid.SetColumn(btn, c);
+                    NumpadGrid.Children.Add(btn);
+                }
+            }
+        }
     }
     
     private void Numpad_Click(object sender, RoutedEventArgs e)
