@@ -220,33 +220,7 @@ public partial class MainWindow : Window
     
     private void NumpadButton_Click(object sender, RoutedEventArgs e)
     {
-        try
-        {
-            _numpadVisible = !_numpadVisible;
-            if (_numpadVisible)
-            {
-                NumpadColumn.Width = new GridLength(200);
-                NumpadPanel.Visibility = Visibility.Visible;
-                NumpadButton.Content = "⌨";
-                _trackpadWasFullWidth = IsTrackpadAtFullWidth();
-                if (_trackpadWasFullWidth)
-                {
-                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), System.Windows.Threading.DispatcherPriority.Loaded);
-                }
-            }
-            else
-            {
-                NumpadColumn.Width = new GridLength(0);
-                NumpadPanel.Visibility = Visibility.Collapsed;
-                NumpadButton.Content = "#";
-                if (_trackpadWasFullWidth)
-                {
-                    Dispatcher.BeginInvoke(new Action(() => UpdateTrackpadToFullWidth()), System.Windows.Threading.DispatcherPriority.Loaded);
-                }
-            }
-        }
-        catch { /* Ignore */ }
-        // ...existing code...
+        // Removed: NumpadButton no longer exists
     }
 
     

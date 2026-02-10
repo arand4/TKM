@@ -22,7 +22,10 @@
         
         <!-- Always-visible vertical toolbar for window controls -->
         <Border Grid.Column="0" Background="#222" BorderBrush="#444" BorderThickness="0,0,1,0" CornerRadius="8,0,0,8" Margin="0,40,0,0" VerticalAlignment="Stretch" Effect="{DynamicResource DropShadowEffect}">
-            <!-- Removed custom window control buttons; using native window chrome -->
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8,24,8,8" Width="48" Panel.ZIndex="100">
+                <Button x:Name="NumpadButton" Style="{StaticResource ControlButtonStyle}" Content="#" Click="NumpadButton_Click" ToolTip="Toggle Numpad" Margin="0,0,0,8"/>
+                <Button x:Name="SettingsButton" Style="{StaticResource ControlButtonStyle}" Content="⚙" Click="SettingsButton_Click" ToolTip="Settings" Margin="0,0,0,8"/>
+            </StackPanel>
         </Border>
 
         <!-- Main Content -->
