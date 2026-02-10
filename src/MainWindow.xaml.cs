@@ -9,6 +9,7 @@ using TouchKeyboardMouse.Helpers;
 namespace TouchKeyboardMouse
 {
 public partial class MainWindow : Window
+{
     // UI controls
     private Button FullscreenButton;
     private Button MinimizeButton;
@@ -27,7 +28,6 @@ public partial class MainWindow : Window
     private TextBlock CursorSensitivityValue;
     private TextBlock ScrollSensitivityValue;
     private TextBlock TapThresholdValue;
-{
     // Workaround for WPF/WindowChrome bug: restore interactivity after state change
     private void RestoreTitlebarInteractivity()
     {
