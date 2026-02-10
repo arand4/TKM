@@ -26,3 +26,7 @@
 /workspaces/TKM/src/obj/Debug/net8.0-windows/TouchKeyboardMouse.pdb
 /workspaces/TKM/src/obj/Debug/net8.0-windows/TouchKeyboardMouse.genruntimeconfig.cache
 /workspaces/TKM/src/obj/Debug/net8.0-windows/ref/TouchKeyboardMouse.dll
+/workspaces/TKM/src/obj/Debug/net8.0-windows/Fullscreen/MainWindow.baml
+/workspaces/TKM/src/obj/Debug/net8.0-windows/Windowed/MainWindow.baml
+/workspaces/TKM/src/obj/Debug/net8.0-windows/Fullscreen/MainWindow.g.cs
+/workspaces/TKM/src/obj/Debug/net8.0-windows/Windowed/MainWindow.g.cs

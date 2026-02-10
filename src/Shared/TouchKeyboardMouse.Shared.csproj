@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>TouchKeyboardMouse.Shared</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="AppState.cs" />
+    <Compile Include="AppStateHelper.cs" />
+  </ItemGroup>
+</Project>

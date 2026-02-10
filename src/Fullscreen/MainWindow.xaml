@@ -1,0 +1,8 @@
+<Window x:Class="TouchKeyboardMouse.Fullscreen.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:TouchKeyboardMouse.Controls"
+        WindowStyle="None" WindowState="Maximized"
+        Title="TKM Fullscreen" Height="600" Width="1000" Loaded="Window_Loaded">
+    <!-- ...existing keyboard, trackpad, numpad, sidebar layout... -->
+</Window>
