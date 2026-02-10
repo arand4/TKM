@@ -573,23 +573,23 @@ public partial class MainWindow : Window
                 // Right grip: moving right increases width, moving left decreases
                 delta = currentPoint.X - _resizeStartPoint.X;
             }
-            // Defensive: check controls before using
-            if (TrackpadArea != null && Trackpad != null && _trackpadWasFullWidth)
+            // Calculate new width
+            double newWidth = Math.Max(200, _resizeStartWidth + delta);
+            var maxWidth = TrackpadArea.ActualWidth - 24; // Account for grip widths
+            if (maxWidth > 200) newWidth = Math.Min(newWidth, maxWidth);
+            Trackpad.Width = newWidth;
+            _trackpadWasFullWidth = false; // User is manually resizing
+            // Save trackpad width
+            if (_appState != null)
             {
-                UpdateTrackpadToFullWidth();
-            }
-            // Save window size and position
-            if (this.WindowState == WindowState.Normal && _appState != null)
-            {
-                _appState.WindowWidth = this.Width;
-                _appState.WindowHeight = this.Height;
-                _appState.WindowLeft = this.Left;
-                _appState.WindowTop = this.Top;
+                _appState.TrackpadWidth = newWidth;
                 AppStateHelper.Save(_appState);
             }
             try { RestoreTitlebarInteractivity(); } catch { }
         }
         catch { /* Ignore resize errors */ }
+        // After toggling fullscreen, refresh layout and controls
+        try { InvalidateVisual(); UpdateLayout(); RestoreTitlebarInteractivity(); } catch { }
     }
     
     #endregion
