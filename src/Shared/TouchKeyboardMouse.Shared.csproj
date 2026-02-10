@@ -4,7 +4,4 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>TouchKeyboardMouse.Shared</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <Page Include="Controls/*.xaml" />
-  </ItemGroup>
 </Project>
