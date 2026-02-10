@@ -562,31 +562,34 @@ public partial class MainWindow : Window
             var currentPoint = e.GetPosition(TrackpadArea);
             var isLeftGrip = sender == LeftResizeGrip;
             // Calculate delta from center
-            double delta;
+            double delta = 0;
             if (isLeftGrip)
             {
                 // Left grip: moving left increases width, moving right decreases
                 delta = _resizeStartPoint.X - currentPoint.X;
-            try
-            {
-                // Defensive: check controls before using
-                if (TrackpadArea != null && Trackpad != null && _trackpadWasFullWidth)
-                {
-                    UpdateTrackpadToFullWidth();
-                }
-                // Save window size and position
-                if (this.WindowState == WindowState.Normal && _appState != null)
-                {
-                    _appState.WindowWidth = this.Width;
-                    _appState.WindowHeight = this.Height;
-                    _appState.WindowLeft = this.Left;
-                    _appState.WindowTop = this.Top;
-                    AppStateHelper.Save(_appState);
-                }
-                try { RestoreTitlebarInteractivity(); } catch { }
             }
-            catch { /* Ignore resize errors */ }
+            else
+            {
+                // Right grip: moving right increases width, moving left decreases
+                delta = currentPoint.X - _resizeStartPoint.X;
+            }
+            // Defensive: check controls before using
+            if (TrackpadArea != null && Trackpad != null && _trackpadWasFullWidth)
+            {
+                UpdateTrackpadToFullWidth();
+            }
+            // Save window size and position
+            if (this.WindowState == WindowState.Normal && _appState != null)
+            {
+                _appState.WindowWidth = this.Width;
+                _appState.WindowHeight = this.Height;
+                _appState.WindowLeft = this.Left;
+                _appState.WindowTop = this.Top;
+                AppStateHelper.Save(_appState);
+            }
+            try { RestoreTitlebarInteractivity(); } catch { }
         }
+        catch { /* Ignore resize errors */ }
     }
     
     #endregion
