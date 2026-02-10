@@ -20,12 +20,23 @@
     
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         
+        <!-- Always-visible vertical toolbar for window controls -->
+        <Border Grid.Column="0" Background="#222" BorderBrush="#444" BorderThickness="0,0,1,0" CornerRadius="8,0,0,8" Margin="0,40,0,0" VerticalAlignment="Stretch" Effect="{DynamicResource DropShadowEffect}">
+            <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8,24,8,8" Width="48" Panel.ZIndex="100">
+                <Button x:Name="NumpadButton" Style="{StaticResource ControlButtonStyle}" Content="#" Click="NumpadButton_Click" ToolTip="Toggle Numpad" Margin="0,0,0,8"/>
+                <Button x:Name="SettingsButton" Style="{StaticResource ControlButtonStyle}" Content="⚙" Click="SettingsButton_Click" ToolTip="Settings" Margin="0,0,0,8"/>
+                <Button x:Name="FullscreenButton" Style="{StaticResource ControlButtonStyle}" Content="⛶" Click="FullscreenButton_Click" ToolTip="Toggle Fullscreen (F11)" Margin="0,0,0,8"/>
+                <Button x:Name="MinimizeButton" Style="{StaticResource ControlButtonStyle}" Content="−" Click="MinimizeButton_Click" ToolTip="Minimize" Margin="0,0,0,8"/>
+                <Button x:Name="CloseButton" Style="{StaticResource CloseButtonStyle}" Content="✕" Click="CloseButton_Click" ToolTip="Exit (Esc)"/>
+            </StackPanel>
+        </Border>
+
         <!-- Main Content -->
-        <Grid Grid.Column="0">
+        <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <!-- Top bar with controls -->
                 <RowDefinition Height="40"/>
@@ -40,33 +51,16 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    
                     <!-- Draggable title area -->
-                    <Border Grid.Column="0" Background="Transparent" 
-                            MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <Border Grid.Column="0" Background="Transparent" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
                             <TextBlock Text="Touch Keyboard &amp; Mouse" Foreground="#888" FontSize="14" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="PostureStatusText" Text="" Foreground="#666" FontSize="12" 
-                                       VerticalAlignment="Center" Margin="15,0,0,0"/>
+                            <TextBlock x:Name="PostureStatusText" Text="" Foreground="#666" FontSize="12" VerticalAlignment="Center" Margin="15,0,0,0"/>
                         </StackPanel>
                     </Border>
-                    
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0"
-                                WindowChrome.IsHitTestVisibleInChrome="True">
-                            <!-- (Window controls moved to vertical toolbar; this area intentionally left blank) -->
-                            </StackPanel>
                 </Grid>
             </Border>
-                <!-- Always-visible vertical toolbar for window controls -->
-                <StackPanel Orientation="Vertical" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8,48,0,0" Width="48" Panel.ZIndex="100">
-                    <Button x:Name="NumpadButton" Style="{StaticResource ControlButtonStyle}" Content="#" Click="NumpadButton_Click" ToolTip="Toggle Numpad" Margin="0,0,0,8"/>
-                    <Button x:Name="SettingsButton" Style="{StaticResource ControlButtonStyle}" Content="⚙" Click="SettingsButton_Click" ToolTip="Settings" Margin="0,0,0,8"/>
-                    <Button x:Name="FullscreenButton" Style="{StaticResource ControlButtonStyle}" Content="⛶" Click="FullscreenButton_Click" ToolTip="Toggle Fullscreen (F11)" Margin="0,0,0,8"/>
-                    <Button x:Name="MinimizeButton" Style="{StaticResource ControlButtonStyle}" Content="−" Click="MinimizeButton_Click" ToolTip="Minimize" Margin="0,0,0,8"/>
-                    <Button x:Name="CloseButton" Style="{StaticResource CloseButtonStyle}" Content="✕" Click="CloseButton_Click" ToolTip="Exit (Esc)"/>
-                </StackPanel>
             <!-- Keyboard -->
             <local:VirtualKeyboard x:Name="Keyboard" Grid.Row="1" Margin="5"/>
             
