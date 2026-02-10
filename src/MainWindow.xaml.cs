@@ -45,22 +45,6 @@ public partial class MainWindow : Window
                 AppStateHelper.Save(_appState);
             }
             this.UpdateWindowActivationStyle();
-            // Recreate the entire window to ensure all controls and event handlers are fresh
-            Dispatcher.BeginInvoke(new Action(() => {
-                var oldState = _appState;
-                var oldWindow = this;
-                var newWindow = new MainWindow();
-                if (oldState != null)
-                {
-                    newWindow.Left = oldState.WindowLeft;
-                    newWindow.Top = oldState.WindowTop;
-                    newWindow.Width = oldState.WindowWidth;
-                    newWindow.Height = oldState.WindowHeight;
-                    newWindow.IsFullscreen = oldState.IsFullscreen;
-                }
-                newWindow.Show();
-                oldWindow.Close();
-            }), System.Windows.Threading.DispatcherPriority.ApplicationIdle);
         }
         catch { /* Ignore state change errors */ }
         finally
