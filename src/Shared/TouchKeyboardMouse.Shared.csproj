@@ -5,6 +5,5 @@
   </PropertyGroup>
   <ItemGroup>
     <Page Include="Controls/*.xaml" />
-    <Compile Include="Controls/*.xaml.cs" />
   </ItemGroup>
 </Project>
