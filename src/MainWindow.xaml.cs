@@ -97,7 +97,7 @@ public partial class MainWindow : Window
                 RestoreTitlebarInteractivity();
                 InvalidateVisual();
                 UpdateLayout();
-                Keyboard.Focus(this);
+                Keyboard.Focus();
                 if (Keyboard != null) Keyboard.Focus();
                 if (Trackpad != null) Trackpad.Focus();
             } catch { }
@@ -490,7 +490,7 @@ public partial class MainWindow : Window
                 RestoreTitlebarInteractivity();
                 InvalidateVisual();
                 UpdateLayout();
-                Keyboard.Focus(this);
+                Keyboard.Focus();
                 if (Keyboard != null) Keyboard.Focus();
                 if (Trackpad != null) Trackpad.Focus();
             } catch { }
