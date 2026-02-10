@@ -1,5 +1,5 @@
 ﻿TouchKeyboardMouse
-1.0.0.0
+
 
 winexe
 C#
@@ -12,9 +12,9 @@ TRACE;DEBUG;NET;NET8_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR
 /workspaces/TKM/src/App.xaml
 41967002545
 
-11-127635088
+91204042716
 2071628141022
 Controls/Trackpad.xaml;Controls/VirtualKeyboard.xaml;MainWindow.xaml;Styles/KeyboardStyles.xaml;
 
-True
+False
 

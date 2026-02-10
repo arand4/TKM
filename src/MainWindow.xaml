@@ -137,9 +137,9 @@
             </Grid>
         </Grid>
         
-        <!-- Settings Sidebar -->
-        <Border x:Name="SettingsSidebar" Grid.Column="1" Width="280" Background="#181818" 
-                BorderBrush="#333" BorderThickness="1,0,0,0" Visibility="Collapsed">
+        <!-- Settings Sidebar (always docked right, overlays main content) -->
+        <Border x:Name="SettingsSidebar" Grid.Column="1" HorizontalAlignment="Right" Width="280" Background="#181818" 
+            BorderBrush="#333" BorderThickness="1,0,0,0" Visibility="Collapsed" Panel.ZIndex="200">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="50"/>

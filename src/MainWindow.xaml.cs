@@ -15,7 +15,31 @@ public partial class MainWindow : Window
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
-        // No custom fullscreen logic needed with standard chrome
+        // Re-apply event handlers and visibility for controls after state change
+        try
+        {
+            // Restore numpad visibility
+            NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
+            // Restore settings sidebar visibility
+            SettingsSidebar.Visibility = SettingsSidebar.Visibility;
+            // Re-attach resize event handlers if needed
+            LeftResizeGrip.MouseDown -= ResizeGrip_MouseDown;
+            LeftResizeGrip.MouseMove -= ResizeGrip_MouseMove;
+            LeftResizeGrip.MouseUp -= ResizeGrip_MouseUp;
+            RightResizeGrip.MouseDown -= ResizeGrip_MouseDown;
+            RightResizeGrip.MouseMove -= ResizeGrip_MouseMove;
+            RightResizeGrip.MouseUp -= ResizeGrip_MouseUp;
+            LeftResizeGrip.MouseDown += ResizeGrip_MouseDown;
+            LeftResizeGrip.MouseMove += ResizeGrip_MouseMove;
+            LeftResizeGrip.MouseUp += ResizeGrip_MouseUp;
+            RightResizeGrip.MouseDown += ResizeGrip_MouseDown;
+            RightResizeGrip.MouseMove += ResizeGrip_MouseMove;
+            RightResizeGrip.MouseUp += ResizeGrip_MouseUp;
+            // Force layout refresh
+            InvalidateVisual();
+            UpdateLayout();
+        }
+        catch { /* Ignore */ }
     }
     // Dynamically update window activation style based on fullscreen/windowed mode
     public void UpdateWindowActivationStyle()
@@ -220,7 +244,29 @@ public partial class MainWindow : Window
     
     private void NumpadButton_Click(object sender, RoutedEventArgs e)
     {
-        // Removed: NumpadButton no longer exists
+        try
+        {
+            _numpadVisible = !_numpadVisible;
+            NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
+            // Animate or update layout if needed
+            if (_numpadVisible)
+            {
+                NumpadPanel.Visibility = Visibility.Visible;
+                NumpadPanel.UpdateLayout();
+                NumpadPanel.InvalidateVisual();
+            }
+            else
+            {
+                NumpadPanel.Visibility = Visibility.Collapsed;
+            }
+            // Save state
+            if (_appState != null)
+            {
+                _appState.NumpadVisible = _numpadVisible;
+                AppStateHelper.Save(_appState);
+            }
+        }
+        catch { /* Ignore */ }
     }
 
     
