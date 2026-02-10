@@ -276,22 +276,23 @@ public partial class MainWindow : Window
                 double availableWidth = TrackpadArea.ActualWidth - 24;
                 if (_numpadVisible)
                 {
+                    // Only shrink if trackpad would overlap numpad; never expand
                     if (Trackpad.Width > availableWidth)
+                    {
                         _trackpadPreviousWidth = Trackpad.Width;
-                    Trackpad.Width = Math.Max(availableWidth, 300);
+                        Trackpad.Width = Math.Max(availableWidth, 300);
+                    }
+                    // If already small, do nothing (don't expand)
                 }
                 else
                 {
-                    // Restore previous width if it was stored, else keep current width
+                    // Restore previous width only if it was shrunk for numpad
                     if (_trackpadPreviousWidth.HasValue)
                     {
                         Trackpad.Width = _trackpadPreviousWidth.Value;
                         _trackpadPreviousWidth = null;
                     }
-                    else
-                    {
-                        Trackpad.Width = Trackpad.Width; // No change
-                    }
+                    // else: keep current width
                 }
                 Trackpad.UpdateLayout();
                 TrackpadWithGrips.InvalidateVisual();
