@@ -447,7 +447,6 @@ public partial class MainWindow : Window
             }
         }
     }
-    }
     
     private void Numpad_Click(object sender, RoutedEventArgs e)
     {
