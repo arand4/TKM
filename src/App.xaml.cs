@@ -39,16 +39,19 @@ public partial class App : Application
     {
         try
         {
-            var mainWindow = Current?.MainWindow as TouchKeyboardMouse.MainWindow;
-            if (mainWindow != null)
+            this.Dispatcher.Invoke(() =>
             {
-                string info = $"Heartbeat: WindowState={mainWindow.WindowState}, NumpadVisible={mainWindow.NumpadPanel?.Visibility}, TrackpadWidth={mainWindow.Trackpad?.Width}, TrackpadActualWidth={mainWindow.Trackpad?.ActualWidth}, NumpadColumnWidth={mainWindow.NumpadColumn?.Width.Value}";
-                TouchKeyboardMouse.Helpers.AppLogger.Log(info);
-            }
-            else
-            {
-                TouchKeyboardMouse.Helpers.AppLogger.Log("Heartbeat: MainWindow not available");
-            }
+                var mainWindow = Current?.MainWindow as TouchKeyboardMouse.MainWindow;
+                if (mainWindow != null)
+                {
+                    string info = $"Heartbeat: WindowState={mainWindow.WindowState}, NumpadVisible={mainWindow.NumpadPanel?.Visibility}, TrackpadWidth={mainWindow.Trackpad?.Width}, TrackpadActualWidth={mainWindow.Trackpad?.ActualWidth}, NumpadColumnWidth={mainWindow.NumpadColumn?.Width.Value}";
+                    TouchKeyboardMouse.Helpers.AppLogger.Log(info);
+                }
+                else
+                {
+                    TouchKeyboardMouse.Helpers.AppLogger.Log("Heartbeat: MainWindow not available");
+                }
+            });
         }
         catch (Exception ex)
         {
