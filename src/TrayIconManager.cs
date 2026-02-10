@@ -88,10 +88,10 @@ public class TrayIconManager : IDisposable
     private void ShowMainWindow()
     {
         _mainWindow.Show();
-        // Restore to last user state (windowed or fullscreen)
+        // Restore to Normal if minimized
         if (_mainWindow.WindowState == System.Windows.WindowState.Minimized)
         {
-            _mainWindow.WindowState = _mainWindow.IsFullscreen ? System.Windows.WindowState.Maximized : System.Windows.WindowState.Normal;
+            _mainWindow.WindowState = System.Windows.WindowState.Normal;
         }
         _mainWindow.Activate();
     }

@@ -11,72 +11,16 @@ namespace TouchKeyboardMouse
 public partial class MainWindow : Window
 {
     // UI controls are auto-generated from XAML
-    // Prevent recursive state changes
-    private bool _handlingStateChange = false;
+    // No custom activation or fullscreen logic needed
 
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
-        if (_handlingStateChange) return;
-        _handlingStateChange = true;
-        try
-        {
-            // Only update IsFullscreen if the state actually changed
-            if (this.WindowState == WindowState.Maximized && !IsFullscreen)
-            {
-                IsFullscreen = true;
-                if (FullscreenButton != null)
-                {
-                    FullscreenButton.Content = "⧉";
-                    FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
-                }
-            }
-            else if (this.WindowState == WindowState.Normal && IsFullscreen)
-            {
-                IsFullscreen = false;
-                if (FullscreenButton != null)
-                {
-                    FullscreenButton.Content = "⛶";
-                    FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
-                }
-            }
-            if (_appState != null)
-            {
-                _appState.IsFullscreen = IsFullscreen;
-                AppStateHelper.Save(_appState);
-            }
-            this.UpdateWindowActivationStyle();
-        }
-        catch { /* Ignore state change errors */ }
-        finally
-        {
-            _handlingStateChange = false;
-            try {
-                InvalidateVisual();
-                UpdateLayout();
-                Keyboard.Focus();
-                if (Keyboard != null) Keyboard.Focus();
-                if (Trackpad != null) Trackpad.Focus();
-            } catch { }
-        }
+        // No custom fullscreen logic needed with standard chrome
     }
     // Dynamically update window activation style based on fullscreen/windowed mode
     public void UpdateWindowActivationStyle()
     {
-        var hwnd = new WindowInteropHelper(this).Handle;
-        var extendedStyle = GetWindowLong(hwnd, GWL_EXSTYLE);
-        if (IsFullscreen)
-        {
-            // Remove NOACTIVATE and TOOLWINDOW for fullscreen
-            extendedStyle &= ~WS_EX_NOACTIVATE;
-            extendedStyle &= ~WS_EX_TOOLWINDOW;
-        }
-        else
-        {
-            // Add NOACTIVATE and TOOLWINDOW for windowed mode
-            extendedStyle |= WS_EX_NOACTIVATE;
-            extendedStyle |= WS_EX_TOOLWINDOW;
-        }
-        SetWindowLong(hwnd, GWL_EXSTYLE, extendedStyle);
+        // No-op: using standard window chrome
     }
     // ...existing code...
     private void MinimizeButton_Click(object sender, RoutedEventArgs e)
@@ -104,19 +48,12 @@ public partial class MainWindow : Window
     }
     // Keep window from being focused to allow typing in other apps
     private const int GWL_EXSTYLE = -20;
-    private const int WS_EX_NOACTIVATE = 0x08000000;
-    private const int WS_EX_TOOLWINDOW = 0x00000080;
-
-    [DllImport("user32.dll")]
-    private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-    [DllImport("user32.dll")]
-    private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+    // Removed custom window style constants and interop
 
     private DualScreenHelper? _dualScreenHelper;
     private TrayIconManager? _trayIconManager;
     private bool _isHiddenDueToPosture = false;
-    public bool IsFullscreen { get; set; } = false;
+    // Removed IsFullscreen property
 
     // ...existing code...
     private bool _settingsInitialized = false;
@@ -134,25 +71,17 @@ public partial class MainWindow : Window
         InitializeComponent();
         this.KeyDown += MainWindow_KeyDown;
         _appState = AppStateHelper.Load();
-        // Default to windowed mode unless persisted fullscreen
-        IsFullscreen = _appState != null && _appState.IsFullscreen;
-        if (IsFullscreen)
+        // Always start in windowed mode with persisted size/position
+        this.WindowState = WindowState.Normal;
+        if (_appState != null && _appState.WindowWidth > 0 && _appState.WindowHeight > 0)
         {
-            this.WindowState = WindowState.Maximized;
+            this.Width = _appState.WindowWidth;
+            this.Height = _appState.WindowHeight;
         }
-        else
+        if (_appState != null && _appState.WindowLeft >= 0 && _appState.WindowTop >= 0)
         {
-            this.WindowState = WindowState.Normal;
-            if (_appState != null && _appState.WindowWidth > 0 && _appState.WindowHeight > 0)
-            {
-                this.Width = _appState.WindowWidth;
-                this.Height = _appState.WindowHeight;
-            }
-            if (_appState != null && _appState.WindowLeft >= 0 && _appState.WindowTop >= 0)
-            {
-                this.Left = _appState.WindowLeft;
-                this.Top = _appState.WindowTop;
-            }
+            this.Left = _appState.WindowLeft;
+            this.Top = _appState.WindowTop;
         }
         // Restore trackpad width
         if (_appState != null && _appState.TrackpadWidth > 0 && Trackpad != null)
@@ -255,8 +184,7 @@ public partial class MainWindow : Window
         this.Top = screen.Bounds.Top;
         this.Width = screen.Bounds.Width;
         this.Height = screen.Bounds.Height;
-        if (IsFullscreen)
-            this.WindowState = WindowState.Maximized;
+        // Removed IsFullscreen logic
     }
 
 
@@ -276,10 +204,6 @@ public partial class MainWindow : Window
                     this.Close();
                 }
             }
-            else if (e.Key == Key.F11)
-            {
-                ToggleFullscreen();
-            }
         }
         catch { /* Ignore */ }
     }
@@ -291,20 +215,7 @@ public partial class MainWindow : Window
     
     private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
-        try
-        {
-            if (e.ClickCount == 2)
-            {
-                // Double-click to toggle fullscreen
-                ToggleFullscreen();
-            }
-            else if (WindowState != WindowState.Maximized)
-            {
-                // Drag window when not maximized
-                this.DragMove();
-            }
-        }
-        catch { /* Ignore drag errors */ }
+        // Drag window if not maximized (optional, or remove entirely)
     }
     
     private void NumpadButton_Click(object sender, RoutedEventArgs e)
@@ -385,62 +296,18 @@ public partial class MainWindow : Window
 
     private void FullscreenButton_Click(object sender, RoutedEventArgs e)
     {
-        try { ToggleFullscreen(); } catch { }
+        // Use built-in maximize/restore
+        if (this.WindowState == WindowState.Maximized)
+        {
+            this.WindowState = WindowState.Normal;
+        }
+        else
+        {
+            this.WindowState = WindowState.Maximized;
+        }
     }
 
-    private void ToggleFullscreen()
-    {
-        if (_handlingStateChange) return;
-        _handlingStateChange = true;
-        try
-        {
-            if (IsFullscreen)
-            {
-                // Exit fullscreen
-                this.WindowState = WindowState.Normal;
-                var workArea = SystemParameters.WorkArea;
-                this.Width = Math.Min(1200, workArea.Width * 0.8);
-                this.Height = Math.Min(700, workArea.Height * 0.8);
-                this.Left = (workArea.Width - this.Width) / 2;
-                this.Top = (workArea.Height - this.Height) / 2;
-                if (FullscreenButton != null)
-                {
-                    FullscreenButton.Content = "⛶";
-                    FullscreenButton.ToolTip = "Enter Fullscreen (F11)";
-                }
-                IsFullscreen = false;
-            }
-            else
-            {
-                // Enter fullscreen
-                this.WindowState = WindowState.Maximized;
-                if (FullscreenButton != null)
-                {
-                    FullscreenButton.Content = "⧉";
-                    FullscreenButton.ToolTip = "Exit Fullscreen (F11)";
-                }
-                IsFullscreen = true;
-            }
-            if (_appState != null)
-            {
-                _appState.IsFullscreen = IsFullscreen;
-                AppStateHelper.Save(_appState);
-            }
-            this.UpdateWindowActivationStyle();
-        }
-        catch { /* Ignore fullscreen toggle errors */ }
-        finally
-        {
-            _handlingStateChange = false;
-            try {
-                InvalidateVisual();
-                UpdateLayout();
-                Keyboard.Focus();
-                if (Keyboard != null) Keyboard.Focus();
-                if (Trackpad != null) Trackpad.Focus();
-            } catch { }
-        }
-    }
+    // Removed ToggleFullscreen method
     // ...existing code...
 
 
