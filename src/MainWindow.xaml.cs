@@ -9,6 +9,7 @@ using TouchKeyboardMouse.Helpers;
 namespace TouchKeyboardMouse
 {
 public partial class MainWindow : Window
+    private System.Windows.Threading.DispatcherTimer? _uiHeartbeatTimer;
 {
     // UI controls are auto-generated from XAML
     // No custom activation or fullscreen logic needed
@@ -21,13 +22,15 @@ public partial class MainWindow : Window
     private void MainWindow_StateChanged(object? sender, EventArgs e)
     {
         // Re-apply event handlers and visibility for controls after state change
+        TouchKeyboardMouse.Helpers.AppLogger.Log("MainWindow_StateChanged: START");
         try
         {
-            // Restore numpad visibility and column width
+            TouchKeyboardMouse.Helpers.AppLogger.Log("MainWindow_StateChanged: Restore numpad visibility and column width");
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
             NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
             if (TrackpadArea != null && Trackpad != null && TrackpadWithGrips != null)
             {
+                TouchKeyboardMouse.Helpers.AppLogger.Log("MainWindow_StateChanged: Trackpad layout update");
                 if (_numpadVisible)
                 {
                     var availableWidth = TrackpadArea.ActualWidth - 24;
@@ -45,12 +48,14 @@ public partial class MainWindow : Window
                 TrackpadArea.InvalidateVisual();
                 Trackpad.InvalidateVisual();
             }
+            TouchKeyboardMouse.Helpers.AppLogger.Log("MainWindow_StateChanged: UpdateLayout/InvalidateVisual");
             UpdateLayout();
             InvalidateVisual();
             TouchKeyboardMouse.Helpers.AppLogger.Log($"MainWindow_StateChanged: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}, Trackpad.Width={Trackpad.Width}, Trackpad.ActualWidth={Trackpad.ActualWidth}");
             // Restore settings sidebar visibility
             SettingsSidebar.Visibility = SettingsSidebar.Visibility;
             // Re-attach resize event handlers if needed
+            TouchKeyboardMouse.Helpers.AppLogger.Log("MainWindow_StateChanged: Re-attach resize event handlers");
             LeftResizeGrip.MouseDown -= ResizeGrip_MouseDown;
             LeftResizeGrip.MouseMove -= ResizeGrip_MouseMove;
             LeftResizeGrip.MouseUp -= ResizeGrip_MouseUp;
@@ -65,6 +70,7 @@ public partial class MainWindow : Window
             RightResizeGrip.MouseUp += ResizeGrip_MouseUp;
         }
         catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "MainWindow_StateChanged"); }
+        TouchKeyboardMouse.Helpers.AppLogger.Log("MainWindow_StateChanged: END");
     }
     // Dynamically update window activation style based on fullscreen/windowed mode
     public void UpdateWindowActivationStyle()
@@ -157,6 +163,14 @@ public partial class MainWindow : Window
         UpdateTrackpadWidth();
 
         // Initial positioning based on current posture
+        // Start UI heartbeat logger
+        _uiHeartbeatTimer = new System.Windows.Threading.DispatcherTimer();
+        _uiHeartbeatTimer.Interval = TimeSpan.FromSeconds(1);
+        _uiHeartbeatTimer.Tick += (s, e) =>
+        {
+            TouchKeyboardMouse.Helpers.AppLogger.Log($"UIHeartbeat: {DateTime.Now:HH:mm:ss.fff} UI thread alive. WindowState={this.WindowState}, NumpadVisible={NumpadPanel?.Visibility}, TrackpadWidth={Trackpad?.Width}, TrackpadActualWidth={Trackpad?.ActualWidth}");
+        };
+        _uiHeartbeatTimer.Start();
     }
 
     private void MainWindow_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -256,7 +270,11 @@ public partial class MainWindow : Window
 
     private void SettingsButton_Click(object sender, RoutedEventArgs e)
     {
-        try { ToggleSettings(); } catch { }
+        try {
+            TouchKeyboardMouse.Helpers.AppLogger.Log("SettingsButton_Click: START");
+            ToggleSettings();
+            TouchKeyboardMouse.Helpers.AppLogger.Log("SettingsButton_Click: END");
+        } catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "SettingsButton_Click"); }
     }
     
     
@@ -264,6 +282,7 @@ public partial class MainWindow : Window
     {
         try
         {
+            TouchKeyboardMouse.Helpers.AppLogger.Log("NumpadButton_Click: START");
             _numpadVisible = !_numpadVisible;
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
             NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
@@ -302,6 +321,7 @@ public partial class MainWindow : Window
             UpdateLayout();
             InvalidateVisual();
             TouchKeyboardMouse.Helpers.AppLogger.Log($"NumpadButton_Click: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}, Trackpad.Width={Trackpad.Width}, Trackpad.ActualWidth={Trackpad.ActualWidth}");
+            TouchKeyboardMouse.Helpers.AppLogger.Log("NumpadButton_Click: END");
             if (_appState != null)
             {
                 _appState.NumpadVisible = _numpadVisible;
@@ -425,6 +445,7 @@ public partial class MainWindow : Window
     {
         try
         {
+            TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseDown: START");
             if (TrackpadArea == null || Trackpad == null) return;
             
             _isResizingTrackpad = true;
@@ -438,18 +459,21 @@ public partial class MainWindow : Window
                 
             (sender as Border)?.CaptureMouse();
             e.Handled = true;
+            TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseDown: END");
         }
-        catch { /* Ignore resize errors */ }
-    }
-    
-    private void ResizeGrip_MouseMove(object sender, MouseEventArgs e)
-    {
+        catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "ResizeGrip_MouseDown"); }
         try
         {
-            if (!_isResizingTrackpad || TrackpadArea == null || Trackpad == null) return;
-            var currentPoint = e.GetPosition(TrackpadArea);
-            var isLeftGrip = sender == LeftResizeGrip;
-            // Calculate delta from center
+            TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseUp: START");
+            if (_isResizingTrackpad)
+            {
+                _isResizingTrackpad = false;
+                (sender as Border)?.ReleaseMouseCapture();
+                e.Handled = true;
+            }
+            TouchKeyboardMouse.Helpers.AppLogger.Log("ResizeGrip_MouseUp: END");
+        }
+        catch (Exception ex) { TouchKeyboardMouse.Helpers.AppLogger.LogException(ex, "ResizeGrip_MouseUp"); }
             double delta = 0;
             if (isLeftGrip)
             {
