@@ -23,10 +23,15 @@ public partial class MainWindow : Window
             NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
             if (TrackpadArea != null && Trackpad != null && TrackpadWithGrips != null)
             {
-                var availableWidth = TrackpadArea.ActualWidth - 24;
-                if (availableWidth > 300)
+                if (_numpadVisible)
                 {
-                    Trackpad.Width = availableWidth;
+                    var availableWidth = TrackpadArea.ActualWidth - 24;
+                    if (availableWidth > 300)
+                        Trackpad.Width = availableWidth;
+                }
+                else
+                {
+                    Trackpad.Width = double.NaN; // Auto, fill all available space
                 }
                 TrackpadWithGrips.UpdateLayout();
                 TrackpadArea.UpdateLayout();
@@ -260,13 +265,17 @@ public partial class MainWindow : Window
             _numpadVisible = !_numpadVisible;
             NumpadPanel.Visibility = _numpadVisible ? Visibility.Visible : Visibility.Collapsed;
             NumpadColumn.Width = _numpadVisible ? new GridLength(1, GridUnitType.Auto) : new GridLength(0);
-            // Force trackpad to recalculate width/layout
             if (TrackpadArea != null && Trackpad != null && TrackpadWithGrips != null)
             {
-                var availableWidth = TrackpadArea.ActualWidth - 24;
-                if (availableWidth > 300)
+                if (_numpadVisible)
                 {
-                    Trackpad.Width = availableWidth;
+                    var availableWidth = TrackpadArea.ActualWidth - 24;
+                    if (availableWidth > 300)
+                        Trackpad.Width = availableWidth;
+                }
+                else
+                {
+                    Trackpad.Width = double.NaN; // Auto, fill all available space
                 }
                 TrackpadWithGrips.UpdateLayout();
                 TrackpadArea.UpdateLayout();
@@ -278,7 +287,6 @@ public partial class MainWindow : Window
             UpdateLayout();
             InvalidateVisual();
             TouchKeyboardMouse.Helpers.AppLogger.Log($"NumpadButton_Click: NumpadVisible={_numpadVisible}, NumpadColumn.Width={NumpadColumn.Width.Value}, Trackpad.Width={Trackpad.Width}, Trackpad.ActualWidth={Trackpad.ActualWidth}");
-            // Animate or update layout if needed
             if (_numpadVisible)
             {
                 NumpadPanel.Visibility = Visibility.Visible;
@@ -289,7 +297,6 @@ public partial class MainWindow : Window
             {
                 NumpadPanel.Visibility = Visibility.Collapsed;
             }
-            // Save state
             if (_appState != null)
             {
                 _appState.NumpadVisible = _numpadVisible;
