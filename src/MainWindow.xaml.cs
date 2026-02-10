@@ -16,28 +16,39 @@ public partial class MainWindow : Window
     {
         try
         {
+            // Detach and reattach event handlers for all main controls
             if (FullscreenButton != null)
             {
+                FullscreenButton.Click -= FullscreenButton_Click;
+                FullscreenButton.Click += FullscreenButton_Click;
                 FullscreenButton.IsEnabled = true;
                 FullscreenButton.IsHitTestVisible = true;
             }
             if (MinimizeButton != null)
             {
+                MinimizeButton.Click -= MinimizeButton_Click;
+                MinimizeButton.Click += MinimizeButton_Click;
                 MinimizeButton.IsEnabled = true;
                 MinimizeButton.IsHitTestVisible = true;
             }
             if (CloseButton != null)
             {
+                CloseButton.Click -= CloseButton_Click;
+                CloseButton.Click += CloseButton_Click;
                 CloseButton.IsEnabled = true;
                 CloseButton.IsHitTestVisible = true;
             }
             if (SettingsButton != null)
             {
+                SettingsButton.Click -= SettingsButton_Click;
+                SettingsButton.Click += SettingsButton_Click;
                 SettingsButton.IsEnabled = true;
                 SettingsButton.IsHitTestVisible = true;
             }
             if (NumpadButton != null)
             {
+                NumpadButton.Click -= NumpadButton_Click;
+                NumpadButton.Click += NumpadButton_Click;
                 NumpadButton.IsEnabled = true;
                 NumpadButton.IsHitTestVisible = true;
             }
@@ -51,6 +62,11 @@ public partial class MainWindow : Window
                 TrackpadArea.IsEnabled = true;
                 TrackpadArea.IsHitTestVisible = true;
             }
+            // Force Dispatcher UI update
+            Dispatcher.Invoke(() => {
+                InvalidateVisual();
+                UpdateLayout();
+            }, System.Windows.Threading.DispatcherPriority.Render);
         }
         catch { /* Ignore */ }
     }
