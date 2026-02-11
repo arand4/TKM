@@ -38,5 +38,6 @@ public static class InputSimulator
         public uint time;
         public IntPtr dwExtraInfo;
     }
-    // ...existing code...
+        // ...existing code...
+    #endregion
 }
